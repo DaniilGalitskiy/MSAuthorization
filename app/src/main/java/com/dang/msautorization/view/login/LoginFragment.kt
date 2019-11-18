@@ -1,16 +1,20 @@
 package com.dang.msautorization.view.login
 
-import android.annotation.SuppressLint
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.EditorInfo
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.view.ScreenLogin.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.fragment_login.*
 import javax.inject.Inject
 
 class LoginFragment : Fragment() {
@@ -59,7 +63,7 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        return inflater.inflate(R.layout.fragment_login, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,36 +71,30 @@ class LoginFragment : Fragment() {
         init()
     }
 
-    @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
+
     private fun subscribe(): Disposable = CompositeDisposable(
-        mainViewModel.state.subscribe {
-            when (it) {
-                user -> {
-                    userConstrainElements.visibility = View.VISIBLE
-                    passwordConstrainElements.visibility = View.GONE
-                }
-                password -> {
-                    userConstrainElements.visibility = View.GONE
-                    passwordConstrainElements.visibility = View.VISIBLE
-                }
-            }
+        mainViewModel.state.subscribe { screenLogin ->
+            userTextInputLayout.isVisible = screenLogin == user
+            passwordTextInputLayout.isVisible = screenLogin == password
+
+            nextButton.isVisible = screenLogin == user
+            backButton.isVisible = screenLogin == password
+            loginButton.isVisible = screenLogin == password
         }
     )
 
-    @SuppressLint("ResourceAsColor")
     private fun init() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val window: Window = activity!!.window
 
             window.decorView.systemUiVisibility = 0
-            @Suppress("DEPRECATION")
-            window.statusBarColor = resources.getColor(R.color.blackTopPanel)
+            window.statusBarColor = ContextCompat.getColor(activity!!, R.color.blackTopPanel)
         }
 
         skipButton.setOnClickListener {
             mainViewModel.onSkipButtonClick()
         }
-        loginButton.setOnClickListener{
+        loginButton.setOnClickListener {
             mainViewModel.onLoginButtonClick()
         }
         nextButton.setOnClickListener {
@@ -104,6 +102,20 @@ class LoginFragment : Fragment() {
         }
         backButton.setOnClickListener {
             mainViewModel.onBackButtonClick()
+        }
+
+        userEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                mainViewModel.onNextButtonClick()
+            }
+            false
+        }
+
+        passwordEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                mainViewModel.onLoginButtonClick()
+            }
+            false
         }
     }
 

@@ -7,7 +7,7 @@ import ru.terrakok.cicerone.Router
 class HomeViewModel(private val router: Router) : BaseViewModel(), IHomeViewModel{
 
     override fun onAccountImageClick() {
-        router.backTo(Screens.MainScreen())
+        router.navigateTo(Screens.LoginScreen())
     }
 
 }

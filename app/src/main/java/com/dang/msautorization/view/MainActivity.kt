@@ -48,8 +48,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null)
-            router.newRootScreen(Screens.MainScreen())
+        if (savedInstanceState == null) {
+            router.newRootScreen(Screens.LoginScreen())
+        }
     }
 
     override fun onResume() {

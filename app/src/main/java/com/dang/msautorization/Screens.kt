@@ -7,7 +7,7 @@ import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 class Screens {
 
-    class MainScreen : SupportAppScreen() {
+    class LoginScreen : SupportAppScreen() {
 
         override fun getFragment(): Fragment {
             return LoginFragment.getNewInstance()

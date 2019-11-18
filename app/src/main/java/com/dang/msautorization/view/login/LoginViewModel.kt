@@ -12,11 +12,11 @@ class LoginViewModel(private val router: Router) : BaseViewModel(), IMainViewMod
     override val state = BehaviorSubject.createDefault(ScreenLogin.user)
 
     override fun onSkipButtonClick() {
-        router.navigateTo(Screens.HomeScreen())
+        router.newRootScreen(Screens.HomeScreen())
     }
 
     override fun onLoginButtonClick() {
-        router.navigateTo(Screens.HomeScreen())
+        router.newRootScreen(Screens.HomeScreen())
     }
 
     override fun onBackButtonClick() {

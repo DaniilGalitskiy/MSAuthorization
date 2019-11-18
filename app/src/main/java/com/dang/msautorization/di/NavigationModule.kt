@@ -16,13 +16,9 @@ class NavigationModule {
 
     @Provides
     @Singleton
-    fun provideRouter(): Router {
-        return cicerone.router
-    }
+    fun provideRouter(): Router = cicerone.router
 
     @Provides
     @Singleton
-    fun provideNavigatorHolder(): NavigatorHolder {
-        return cicerone.navigatorHolder
-    }
+    fun provideNavigatorHolder(): NavigatorHolder = cicerone.navigatorHolder
 }
