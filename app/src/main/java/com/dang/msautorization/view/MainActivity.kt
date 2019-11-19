@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
         App.component.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         if (savedInstanceState == null) {
             router.newRootScreen(Screens.LoginScreen())
         }
