@@ -5,16 +5,22 @@ import androidx.appcompat.app.AppCompatActivity
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.Screens
+import com.dang.msautorization.repository.pref.SharedPrefsRepo
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import ru.terrakok.cicerone.commands.Command
+import ru.terrakok.cicerone.commands.Forward
+import ru.terrakok.cicerone.commands.Replace
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var router: Router
+
+    @Inject
+    lateinit var sharedPrefsRepo: SharedPrefsRepo
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
@@ -33,13 +39,20 @@ class MainActivity : AppCompatActivity() {
                 fragmentTransaction
             )
 
-            if (currentFragment != null)
-                fragmentTransaction!!.setCustomAnimations(
-                    R.anim.enter_from_left,
-                    R.anim.exit_to_right,
-                    R.anim.enter_from_right,
-                    R.anim.exit_to_left
-                )
+            if (currentFragment != null) {
+                when (command) {
+                    is Replace -> fragmentTransaction!!.setCustomAnimations(
+                        R.anim.enter_from_left,
+                        R.anim.exit_to_right
+                    )
+                    is Forward -> fragmentTransaction!!.setCustomAnimations(
+                        R.anim.enter_from_bottom,
+                        R.anim.exit_to_top,
+                        R.anim.exit_to_bottom,
+                        R.anim.enter_from_top
+                    )
+                }
+            }
         }
     }
 
@@ -47,8 +60,12 @@ class MainActivity : AppCompatActivity() {
         App.component.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         if (savedInstanceState == null) {
-            router.newRootScreen(Screens.LoginScreen())
+            if (sharedPrefsRepo.isHomeFlag())
+                router.newRootScreen(Screens.HomeScreen())
+            else
+                router.newRootScreen(Screens.LoginScreen())
         }
     }
 

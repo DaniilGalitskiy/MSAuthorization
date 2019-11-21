@@ -1,22 +1,17 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
+<resources>
 
     <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+        <item name="colorButtonNormal">@color/colorDisableButton</item>
+
+        <item name="colorControlActivated">@color/colorAccent</item>
+
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
 
-<!--        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>-->
+        <!--        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>-->
     </style>
-
 </resources>

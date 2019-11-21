@@ -2,13 +2,14 @@
 <resources>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#F7F7F7</color>
-    <color name="colorAccent">#D81B60</color>
-
+    <color name="colorAccent">#0088FF</color>
+    <color name="colorDisableButton">#DDDDDD</color>
 
     <color name="whiteTopPanel">#F7F7F7</color>
     <color name="rippleAccount">#C7C7C7</color>
     <color name="blackTopPanel">#000000</color>
+    <color name="colorEditTextLineDefault">#7E000000</color>
+    <color name="colorRed">#FF0000</color>
 
-    <color name="colorTextBlue">#0088FF</color>
     <color name="colorRippleButtons">#87C9FF</color>
 </resources>

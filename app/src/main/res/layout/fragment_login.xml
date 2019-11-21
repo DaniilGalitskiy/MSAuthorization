@@ -2,11 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/loginContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".view.MainActivity">
-
 
     <Button
         android:id="@+id/skipButton"
@@ -16,7 +16,7 @@
         android:background="@drawable/ripple_buttons"
         android:text="@string/skip"
         android:textAllCaps="false"
-        android:textColor="@color/colorTextBlue"
+        android:textColor="@color/colorAccent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -38,9 +38,9 @@
         android:id="@+id/userTextInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:textColorHint="@android:color/black"
-        app:hintTextColor="@color/colorTextBlue"
+        app:hintTextColor="@color/colorAccent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginTextView">
@@ -64,10 +64,10 @@
         android:background="@drawable/ripple_buttons"
         android:text="@string/next"
         android:textAllCaps="false"
-        android:textColor="@color/colorTextBlue"
-        tools:visibility="visible"
+        android:textColorHighlight="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        tools:visibility="visible" />
 
 
     <!--PASSWORD-->
@@ -75,10 +75,10 @@
         android:id="@+id/passwordTextInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="30dp"
         android:textColorHint="@android:color/black"
         android:visibility="gone"
-        app:hintTextColor="@color/colorTextBlue"
+        app:hintTextColor="@color/colorAccent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginTextView"
@@ -103,11 +103,11 @@
         android:background="@drawable/ripple_buttons"
         android:text="@string/login"
         android:textAllCaps="false"
-        android:textColor="@color/colorTextBlue"
+        android:textColorHighlight="@color/colorAccent"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        tools:visibility="gone" />
 
     <Button
         android:id="@+id/backButton"
@@ -117,10 +117,10 @@
         android:background="@drawable/ripple_buttons"
         android:text="@string/back"
         android:textAllCaps="false"
-        android:textColor="@color/colorTextBlue"
+        android:textColorHighlight="@color/colorAccent"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

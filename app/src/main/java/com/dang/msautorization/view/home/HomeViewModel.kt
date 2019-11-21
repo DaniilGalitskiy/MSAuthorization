@@ -1,10 +1,10 @@
 package com.dang.msautorization.view.home
 
+import androidx.lifecycle.ViewModel
 import com.dang.msautorization.Screens
-import com.dang.msautorization.base.BaseViewModel
 import ru.terrakok.cicerone.Router
 
-class HomeViewModel(private val router: Router) : BaseViewModel(), IHomeViewModel{
+class HomeViewModel(private val router: Router) : ViewModel(), IHomeViewModel{
 
     override fun onAccountImageClick() {
         router.navigateTo(Screens.LoginScreen())

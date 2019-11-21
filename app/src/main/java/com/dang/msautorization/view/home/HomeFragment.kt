@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.dang.msautorization.App
 import com.dang.msautorization.R
@@ -51,7 +55,7 @@ class HomeFragment : Fragment() {
     private fun init() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val window: Window = activity!!.window
-            window.statusBarColor = resources.getColor(R.color.whiteTopPanel)
+            window.statusBarColor = ContextCompat.getColor(activity!!, R.color.whiteTopPanel)
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
 

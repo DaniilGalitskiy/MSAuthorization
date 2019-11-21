@@ -10,7 +10,6 @@ import ru.terrakok.cicerone.Router
 @Module
 class LoginModule(private val fragment: LoginFragment) {
 
-
     @Provides
     fun vm(router: Router): IMainViewModel = ViewModelProviders.of(fragment, object : ViewModelProvider.Factory {
 
