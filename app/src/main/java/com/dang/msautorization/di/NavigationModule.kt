@@ -8,11 +8,11 @@ import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import javax.inject.Singleton
 
-@Module(includes = [AndroidSupportInjectionModule::class])
+@Module
 class NavigationModule {
 
     //cicerone
-    val cicerone: Cicerone<Router> = Cicerone.create()
+    private val cicerone: Cicerone<Router> = Cicerone.create()
 
     @Provides
     @Singleton

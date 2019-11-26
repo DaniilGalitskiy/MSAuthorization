@@ -9,7 +9,9 @@
     <color name="rippleAccount">#C7C7C7</color>
     <color name="blackTopPanel">#000000</color>
     <color name="colorEditTextLineDefault">#7E000000</color>
+
     <color name="colorRed">#FF0000</color>
+    <color name="colorDarkRed">#BB1919</color>
 
     <color name="colorRippleButtons">#87C9FF</color>
 </resources>

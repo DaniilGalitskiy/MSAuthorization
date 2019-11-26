@@ -10,14 +10,14 @@ class Screens {
     class LoginScreen : SupportAppScreen() {
 
         override fun getFragment(): Fragment {
-            return LoginFragment.getNewInstance()
+            return LoginFragment()
         }
     }
 
     class HomeScreen : SupportAppScreen(){
 
         override fun getFragment(): Fragment {
-            return HomeFragment.getNewInstance()
+            return HomeFragment()
         }
     }
 }

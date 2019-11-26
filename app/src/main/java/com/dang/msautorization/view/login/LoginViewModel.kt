@@ -1,29 +1,21 @@
 package com.dang.msautorization.view.login
 
 import androidx.lifecycle.ViewModel
-import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.Screens
-import com.dang.msautorization.repository.pref.SharedPrefsRepo
-import com.dang.msautorization.view.ScreenLogin
+import com.dang.msautorization.domain.connect_network.NetworkConnectModel
+import com.dang.msautorization.repository.pref.SharedPrefsScreen
+import com.dang.msautorization.view.ScreenLoginState
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
-import javax.inject.Inject
 
+class LoginViewModel(
+    private val router: Router, private val sharedPrefsScreen: SharedPrefsScreen,
+    networkConnectModel:
+    NetworkConnectModel
+) : ViewModel(), ILoginViewModel {
 
-class LoginViewModel() : ViewModel(), IMainViewModel {
-
-    @Inject
-    lateinit var sharedPrefsRepo: SharedPrefsRepo
-
-    lateinit var router : Router
-
-    constructor(router: Router) : this() {
-        this.router = router
-        App.component.inject(this)
-    }
-
-    private val stateBehaviorSubject =  BehaviorSubject.createDefault(ScreenLogin.user)
+    private val stateBehaviorSubject = BehaviorSubject.createDefault(ScreenLoginState.user)
 
     private val usernameBehaviorSubject = BehaviorSubject.createDefault("")
     private val passwordBehaviorSubject = BehaviorSubject.createDefault("")
@@ -36,42 +28,46 @@ class LoginViewModel() : ViewModel(), IMainViewModel {
         passwordBehaviorSubject.map { password -> password.isNotEmpty() }.subscribe(this)
     }
 
-    private val usernameHintColorBehaviorSubject = BehaviorSubject.createDefault(R.color.colorAccent)
-    private val passwordHintColorBehaviorSubject = BehaviorSubject.createDefault(R.color.colorAccent)
+    private val usernameHintColorBehaviorSubject =
+        BehaviorSubject.createDefault(R.color.colorAccent)
+    private val passwordHintColorBehaviorSubject =
+        BehaviorSubject.createDefault(R.color.colorAccent)
 
-    override val state get()  = stateBehaviorSubject
+    override val state get() = stateBehaviorSubject
 
     override val nextButtonEnabled get() = isUsernameValidBehaviorSubject
     override val loginButtonEnabled get() = isPasswordValidBehaviorSubject
 
-
     override val usernameHintColor = usernameHintColorBehaviorSubject.distinctUntilChanged()!!
     override val passwordHintColor = passwordHintColorBehaviorSubject.distinctUntilChanged()!!
 
+    override val connectNetworkVisible = networkConnectModel.isNetworkConnectedObservable.map { !it }!!
+
+
     override fun onSkipButtonClick() {
-        if (sharedPrefsRepo.isHomeFlag()){
+        if (sharedPrefsScreen.isHome()) {
             router.backTo(Screens.HomeScreen())
         } else {
             router.newRootScreen(Screens.HomeScreen())
-            sharedPrefsRepo.setHomeFlag()
+            sharedPrefsScreen.setHome()
         }
     }
 
     override fun onLoginButtonClick() {
-        if (sharedPrefsRepo.isHomeFlag()){
+        if (sharedPrefsScreen.isHome()) {
             router.backTo(Screens.HomeScreen())
         } else {
             router.newRootScreen(Screens.HomeScreen())
-            sharedPrefsRepo.setHomeFlag()
+            sharedPrefsScreen.setHome()
         }
     }
 
     override fun onBackButtonClick() {
-        state.onNext(ScreenLogin.user)
+        state.onNext(ScreenLoginState.user)
     }
 
     override fun onNextButtonClick() {
-        state.onNext(ScreenLogin.password)
+        state.onNext(ScreenLoginState.password)
     }
 
 

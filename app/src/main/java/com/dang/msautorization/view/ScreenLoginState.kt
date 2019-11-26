@@ -1,6 +1,6 @@
 package com.dang.msautorization.view
 
-enum class ScreenLogin {
+enum class ScreenLoginState {
     user,
     password
 }

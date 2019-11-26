@@ -8,6 +8,17 @@
     android:orientation="vertical"
     tools:context=".view.MainActivity">
 
+    <TextView
+        android:id="@+id/noConnectTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:background="@color/colorDarkRed"
+        android:text="@string/no_network"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <Button
         android:id="@+id/skipButton"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
@@ -18,7 +29,7 @@
         android:textAllCaps="false"
         android:textColor="@color/colorAccent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/noConnectTextView" />
 
     <TextView
         android:id="@+id/loginTextView"
@@ -30,7 +41,7 @@
         android:textSize="20sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/noConnectTextView" />
 
 
     <!--USER-->

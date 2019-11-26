@@ -1,11 +1,17 @@
 package com.dang.msautorization.view
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.Screens
-import com.dang.msautorization.repository.pref.SharedPrefsRepo
+import com.dang.msautorization.domain.connect_network.NetworkConnectModel
+import com.dang.msautorization.repository.pref.SharedPrefsScreen
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
@@ -20,10 +26,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var router: Router
 
     @Inject
-    lateinit var sharedPrefsRepo: SharedPrefsRepo
+    lateinit var sharedPrefsScreen: SharedPrefsScreen
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
+
+    @Inject
+    lateinit var networkConnectedModel: NetworkConnectModel
 
     private val navigator = object : SupportAppNavigator(this, R.id.mainContainer) {
         override fun setupFragmentTransaction(
@@ -56,17 +65,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val isNextworkConnectedReceiver = object : BroadcastReceiver() {
+        @Suppress("DEPRECATION")
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val connectivityManager =
+                getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            networkConnectedModel.setNetworkConnected(
+                connectivityManager?.activeNetworkInfo?.isConnected ?: false
+            ).subscribe()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            if (sharedPrefsRepo.isHomeFlag())
+            if (sharedPrefsScreen.isHome())
                 router.newRootScreen(Screens.HomeScreen())
             else
                 router.newRootScreen(Screens.LoginScreen())
         }
+
+        registerReceiver(isNextworkConnectedReceiver, IntentFilter().apply {
+            addAction("android.net.conn.CONNECTIVITY_CHANGE")
+            priority = 100
+        })
     }
 
     override fun onResume() {
@@ -77,5 +102,10 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         navigatorHolder.removeNavigator()
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(isNextworkConnectedReceiver)
+        super.onDestroy()
     }
 }

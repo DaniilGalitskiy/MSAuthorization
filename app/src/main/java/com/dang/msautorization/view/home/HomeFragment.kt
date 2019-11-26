@@ -1,7 +1,5 @@
 package com.dang.msautorization.view.home
 
-import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,12 +18,6 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var homeViewModel: IHomeViewModel
 
-    companion object {
-        fun getNewInstance(): HomeFragment {
-            return HomeFragment()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,7 +26,6 @@ class HomeFragment : Fragment() {
             .homeModule(HomeModule(this))
             .build()
             .inject(this)
-
     }
 
     override fun onCreateView(
@@ -50,20 +41,18 @@ class HomeFragment : Fragment() {
         init()
     }
 
-    @SuppressLint("NewApi")
-    @TargetApi(Build.VERSION_CODES.M)
     private fun init() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val window: Window = activity!!.window
             window.statusBarColor = ContextCompat.getColor(activity!!, R.color.whiteTopPanel)
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
 
         homeToolbar.setTitle(R.string.app_name)
-        activity?.menuInflater?.inflate(R.menu.fragment_home_menu, homeToolbar.menu)
+        activity!!.menuInflater.inflate(R.menu.fragment_home_menu, homeToolbar.menu)
 
         accountImage.setOnClickListener {
-            homeViewModel.onAccountImageClick()
+            homeViewModel.onAccountPictureClick()
         }
     }
 }

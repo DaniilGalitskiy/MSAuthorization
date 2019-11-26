@@ -7,7 +7,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.view.animation.TranslateAnimation
 import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
@@ -15,8 +14,8 @@ import androidx.core.view.isVisible
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.core.MVVMFragment
-import com.dang.msautorization.view.ScreenLogin.password
-import com.dang.msautorization.view.ScreenLogin.user
+import com.dang.msautorization.view.ScreenLoginState.password
+import com.dang.msautorization.view.ScreenLoginState.user
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -25,10 +24,10 @@ import javax.inject.Inject
 class LoginFragment : MVVMFragment() {
 
     @Inject
-    lateinit var mainViewModel: IMainViewModel
+    lateinit var loginViewModel: ILoginViewModel
 
     companion object {
-        fun getNewInstance() = LoginFragment()
+        private const val animDuration: Long = 200
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,31 +54,99 @@ class LoginFragment : MVVMFragment() {
         init()
     }
 
+    private fun init() {
+        skipButton.setOnClickListener {
+            loginViewModel.onSkipButtonClick()
+        }
+        loginButton.setOnClickListener {
+            loginViewModel.onLoginButtonClick()
+        }
+        nextButton.setOnClickListener {
+            loginViewModel.onNextButtonClick()
+        }
+        backButton.setOnClickListener {
+            loginViewModel.onBackButtonClick()
+        }
+
+        userEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                loginViewModel.onUsernameChanged(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable) {}
+        })
+
+        passwordEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                loginViewModel.onPasswordChanged(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable) {}
+        })
+
+        userEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                loginViewModel.onNextActionKeyboardClick()
+            }
+            false
+        }
+
+        passwordEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                loginViewModel.onGoActionKeyboardClick()
+            }
+            false
+        }
+    }
 
     override fun subscribe(): Disposable = CompositeDisposable(
-        mainViewModel.state.subscribe { screenLogin ->
+        loginViewModel.state.subscribe { screenLogin ->
             if (isResumed) {
                 when (screenLogin!!) {
                     user -> {
-                        val animateUser =
-                            TranslateAnimation(-loginContainer.width.toFloat(), 0F, 0F, 0F)
-                        animateUser.duration = 200
-                        userTextInputLayout.startAnimation(animateUser)
-                        val animatePassword =
-                            TranslateAnimation(0F, loginContainer.width.toFloat(), 0F, 0F)
-                        animatePassword.duration = 200
-                        passwordTextInputLayout.startAnimation(animatePassword)
+                        userTextInputLayout.startAnimation(
+                            TranslateAnimation(
+                                -loginContainer.width.toFloat(), 0F, 0F, 0F
+                            ).apply {
+                                duration = animDuration
+                            })
+                        passwordTextInputLayout.startAnimation(
+                            TranslateAnimation(
+                                0F, loginContainer.width.toFloat(), 0F, 0F
+                            ).apply {
+                                duration = animDuration
+                            })
                         userEditText.requestFocus()
                     }
                     password -> {
-                        val animateUser =
-                            TranslateAnimation(0F, -loginContainer.width.toFloat(), 0F, 0F)
-                        animateUser.duration = 200
-                        userTextInputLayout.startAnimation(animateUser)
-                        val animatePassword =
-                            TranslateAnimation(loginContainer.width.toFloat(), 0F, 0F, 0F)
-                        animatePassword.duration = 200
-                        passwordTextInputLayout.startAnimation(animatePassword)
+                        userTextInputLayout.startAnimation(
+                            TranslateAnimation(
+                                0F, -loginContainer.width.toFloat(), 0F, 0F
+                            ).apply {
+                                duration = animDuration
+                            })
+                        passwordTextInputLayout.startAnimation(
+                            TranslateAnimation(
+                                loginContainer.width.toFloat(), 0F, 0F, 0F
+                            ).apply {
+                                duration = animDuration
+                            })
                         passwordEditText.requestFocus()
                     }
                 }
@@ -93,81 +160,43 @@ class LoginFragment : MVVMFragment() {
             loginButton.isVisible = screenLogin == password
         },
 
-        mainViewModel.nextButtonEnabled.subscribe { nextEnabled ->
+        loginViewModel.nextButtonEnabled.subscribe { nextEnabled ->
             nextButton.isEnabled = nextEnabled == true
-
         },
 
-        mainViewModel.loginButtonEnabled.subscribe { loginEnabled ->
+        loginViewModel.loginButtonEnabled.subscribe { loginEnabled ->
             loginButton.isEnabled = loginEnabled == true
         },
 
-        mainViewModel.usernameHintColor.subscribe { colorHint ->
+        loginViewModel.usernameHintColor.subscribe { colorHint ->
             userTextInputLayout.hintTextColor =
                 ContextCompat.getColorStateList(activity!!, colorHint)
         },
 
-        mainViewModel.passwordHintColor.subscribe { colorHint ->
+        loginViewModel.passwordHintColor.subscribe { colorHint ->
             passwordTextInputLayout.hintTextColor =
                 ContextCompat.getColorStateList(activity!!, colorHint)
+        },
+
+        loginViewModel.connectNetworkVisible.subscribe { connectNetworkVisible ->
+            noConnectTextView.isVisible = connectNetworkVisible
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                when (connectNetworkVisible) {
+                    true -> {
+                        activity!!.window.statusBarColor =
+                            ContextCompat.getColor(this.activity!!, R.color.colorDarkRed)
+                        activity!!.window.decorView.systemUiVisibility =
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    }
+                    false -> {
+                        activity!!.window.decorView.systemUiVisibility = 0
+                        activity!!.window.statusBarColor =
+                            ContextCompat.getColor(activity!!, R.color.blackTopPanel)
+                    }
+
+                }
+            }
         }
     )
-
-    private fun init() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val window: Window = activity!!.window
-
-            window.decorView.systemUiVisibility = 0
-            window.statusBarColor = ContextCompat.getColor(activity!!, R.color.blackTopPanel)
-        }
-
-        skipButton.setOnClickListener {
-            mainViewModel.onSkipButtonClick()
-        }
-        loginButton.setOnClickListener {
-            mainViewModel.onLoginButtonClick()
-        }
-        nextButton.setOnClickListener {
-            mainViewModel.onNextButtonClick()
-        }
-        backButton.setOnClickListener {
-            mainViewModel.onBackButtonClick()
-        }
-
-
-        userEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                mainViewModel.onUsernameChanged(s.toString())
-            }
-
-            override fun afterTextChanged(s: Editable) {}
-        })
-
-        passwordEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                mainViewModel.onPasswordChanged(s.toString())
-            }
-
-            override fun afterTextChanged(s: Editable) {}
-        })
-
-        userEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                mainViewModel.onNextActionKeyboardClick()
-            }
-            false
-        }
-
-        passwordEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                mainViewModel.onGoActionKeyboardClick()
-            }
-            false
-        }
-    }
 
 }
