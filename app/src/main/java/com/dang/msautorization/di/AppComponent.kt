@@ -26,9 +26,10 @@ interface AppComponent {
     fun networkConnectModel(): NetworkConnectModel
 
     @Component.Builder
-    interface Builder{
+    interface Builder {
         @BindsInstance
         fun context(context: Context): Builder
+
         fun build(): AppComponent
     }
 }

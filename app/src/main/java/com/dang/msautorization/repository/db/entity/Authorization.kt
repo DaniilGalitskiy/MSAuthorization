@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Authorization(
-    @PrimaryKey val id: Int,
-    val name: String,
-    val token: String,
-    val isActive: Boolean = true
+        @PrimaryKey val id: Int,
+        val name: String,
+        val token: String,
+        val isActive: Boolean = true
 )

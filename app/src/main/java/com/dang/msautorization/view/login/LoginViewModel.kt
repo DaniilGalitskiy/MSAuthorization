@@ -9,13 +9,16 @@ import com.dang.msautorization.view.ScreenLoginState
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
 
+
 class LoginViewModel(
-    private val router: Router, private val sharedPrefsScreen: SharedPrefsScreen,
-    networkConnectModel:
-    NetworkConnectModel
+        state: ScreenLoginState?,
+        private val router: Router,
+        private val sharedPrefsScreen: SharedPrefsScreen,
+        networkConnectModel:
+        NetworkConnectModel
 ) : ViewModel(), ILoginViewModel {
 
-    private val stateBehaviorSubject = BehaviorSubject.createDefault(ScreenLoginState.user)
+    private val stateBehaviorSubject = BehaviorSubject.createDefault(state ?: ScreenLoginState.USER)
 
     private val usernameBehaviorSubject = BehaviorSubject.createDefault("")
     private val passwordBehaviorSubject = BehaviorSubject.createDefault("")
@@ -29,9 +32,10 @@ class LoginViewModel(
     }
 
     private val usernameHintColorBehaviorSubject =
-        BehaviorSubject.createDefault(R.color.colorAccent)
+            BehaviorSubject.createDefault(R.color.colorAccent)
     private val passwordHintColorBehaviorSubject =
-        BehaviorSubject.createDefault(R.color.colorAccent)
+            BehaviorSubject.createDefault(R.color.colorAccent)
+
 
     override val state get() = stateBehaviorSubject
 
@@ -41,7 +45,8 @@ class LoginViewModel(
     override val usernameHintColor = usernameHintColorBehaviorSubject.distinctUntilChanged()!!
     override val passwordHintColor = passwordHintColorBehaviorSubject.distinctUntilChanged()!!
 
-    override val connectNetworkVisible = networkConnectModel.isNetworkConnectedObservable.map { !it }!!
+    override val connectNetworkFailedVisible =
+            networkConnectModel.isNetworkConnectedObservable.map { !it }!!
 
 
     override fun onSkipButtonClick() {
@@ -63,13 +68,12 @@ class LoginViewModel(
     }
 
     override fun onBackButtonClick() {
-        state.onNext(ScreenLoginState.user)
+        state.onNext(ScreenLoginState.USER)
     }
 
     override fun onNextButtonClick() {
-        state.onNext(ScreenLoginState.password)
+        state.onNext(ScreenLoginState.PASSWORD)
     }
-
 
     override fun onNextActionKeyboardClick() {
         val isUsernameValid = isUsernameValidBehaviorSubject.value ?: return
@@ -92,4 +96,5 @@ class LoginViewModel(
         passwordBehaviorSubject.onNext(password)
         passwordHintColorBehaviorSubject.onNext(R.color.colorAccent)
     }
+
 }

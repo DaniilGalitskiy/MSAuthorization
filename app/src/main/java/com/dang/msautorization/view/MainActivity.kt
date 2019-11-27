@@ -36,29 +36,29 @@ class MainActivity : AppCompatActivity() {
 
     private val navigator = object : SupportAppNavigator(this, R.id.mainContainer) {
         override fun setupFragmentTransaction(
-            command: Command?,
-            currentFragment: androidx.fragment.app.Fragment?,
-            nextFragment: androidx.fragment.app.Fragment?,
-            fragmentTransaction: androidx.fragment.app.FragmentTransaction?
+                command: Command?,
+                currentFragment: androidx.fragment.app.Fragment?,
+                nextFragment: androidx.fragment.app.Fragment?,
+                fragmentTransaction: androidx.fragment.app.FragmentTransaction?
         ) {
             super.setupFragmentTransaction(
-                command,
-                currentFragment,
-                nextFragment,
-                fragmentTransaction
+                    command,
+                    currentFragment,
+                    nextFragment,
+                    fragmentTransaction
             )
 
             if (currentFragment != null) {
                 when (command) {
                     is Replace -> fragmentTransaction!!.setCustomAnimations(
-                        R.anim.enter_from_left,
-                        R.anim.exit_to_right
+                            R.anim.enter_from_left,
+                            R.anim.exit_to_right
                     )
                     is Forward -> fragmentTransaction!!.setCustomAnimations(
-                        R.anim.enter_from_bottom,
-                        R.anim.exit_to_top,
-                        R.anim.exit_to_bottom,
-                        R.anim.enter_from_top
+                            R.anim.enter_from_bottom,
+                            R.anim.exit_to_top,
+                            R.anim.exit_to_bottom,
+                            R.anim.enter_from_top
                     )
                 }
             }
@@ -69,16 +69,16 @@ class MainActivity : AppCompatActivity() {
         @Suppress("DEPRECATION")
         override fun onReceive(context: Context?, intent: Intent?) {
             val connectivityManager =
-                getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+                    getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
             networkConnectedModel.setNetworkConnected(
-                connectivityManager?.activeNetworkInfo?.isConnected ?: false
+                    connectivityManager?.activeNetworkInfo?.isConnected ?: false
             ).subscribe()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.component.inject(this)
         super.onCreate(savedInstanceState)
+        App.component.inject(this)
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {

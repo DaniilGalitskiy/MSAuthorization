@@ -22,16 +22,16 @@ class HomeFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         DaggerHomeComponent.builder()
-            .appComponent(App.component)
-            .homeModule(HomeModule(this))
-            .build()
-            .inject(this)
+                .appComponent(App.component)
+                .homeModule(HomeModule(this))
+                .build()
+                .inject(this)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }

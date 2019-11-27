@@ -14,8 +14,9 @@ import androidx.core.view.isVisible
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.core.MVVMFragment
-import com.dang.msautorization.view.ScreenLoginState.password
-import com.dang.msautorization.view.ScreenLoginState.user
+import com.dang.msautorization.view.ScreenLoginState
+import com.dang.msautorization.view.ScreenLoginState.PASSWORD
+import com.dang.msautorization.view.ScreenLoginState.USER
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -28,23 +29,30 @@ class LoginFragment : MVVMFragment() {
 
     companion object {
         private const val animDuration: Long = 200
+        private const val STATE_KEY = "STATE_KEY"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         DaggerLoginComponent.builder()
-            .appComponent(App.component)
-            .loginModule(LoginModule(this))
-            .build()
-            .inject(this)
-
+                .appComponent(App.component)
+                .loginModule(
+                        LoginModule(
+                                this,
+                                if (savedInstanceState?.containsKey(STATE_KEY) == true)
+                                    ScreenLoginState.values()[savedInstanceState.getInt(STATE_KEY)]
+                                else null
+                        )
+                )
+                .build()
+                .inject(this)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_login, container, false)
     }
@@ -52,6 +60,12 @@ class LoginFragment : MVVMFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putInt(STATE_KEY, loginViewModel.state.value!!.ordinal)
     }
 
     private fun init() {
@@ -69,12 +83,7 @@ class LoginFragment : MVVMFragment() {
         }
 
         userEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -85,12 +94,7 @@ class LoginFragment : MVVMFragment() {
         })
 
         passwordEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -116,87 +120,67 @@ class LoginFragment : MVVMFragment() {
     }
 
     override fun subscribe(): Disposable = CompositeDisposable(
-        loginViewModel.state.subscribe { screenLogin ->
-            if (isResumed) {
-                when (screenLogin!!) {
-                    user -> {
-                        userTextInputLayout.startAnimation(
+            loginViewModel.state.subscribe { state ->
+                if (isResumed) {
+                    userTextInputLayout.startAnimation(
                             TranslateAnimation(
-                                -loginContainer.width.toFloat(), 0F, 0F, 0F
-                            ).apply {
-                                duration = animDuration
-                            })
-                        passwordTextInputLayout.startAnimation(
+                                    if (state == USER) -loginContainer.width.toFloat() else 0F,
+                                    if (state == USER) 0F else -loginContainer.width.toFloat(),
+                                    0F,
+                                    0F
+                            ).apply { duration = animDuration }
+                    )
+                    passwordTextInputLayout.startAnimation(
                             TranslateAnimation(
-                                0F, loginContainer.width.toFloat(), 0F, 0F
-                            ).apply {
-                                duration = animDuration
-                            })
-                        userEditText.requestFocus()
-                    }
-                    password -> {
-                        userTextInputLayout.startAnimation(
-                            TranslateAnimation(
-                                0F, -loginContainer.width.toFloat(), 0F, 0F
-                            ).apply {
-                                duration = animDuration
-                            })
-                        passwordTextInputLayout.startAnimation(
-                            TranslateAnimation(
-                                loginContainer.width.toFloat(), 0F, 0F, 0F
-                            ).apply {
-                                duration = animDuration
-                            })
-                        passwordEditText.requestFocus()
-                    }
+                                    if (state == USER) 0F else loginContainer.width.toFloat(),
+                                    if (state == USER) loginContainer.width.toFloat() else 0F,
+                                    0F,
+                                    0F
+                            ).apply { duration = animDuration }
+                    )
+                    if (state == USER) userEditText.requestFocus() else passwordEditText.requestFocus()
                 }
-            }
 
-            userTextInputLayout.isVisible = screenLogin == user
-            passwordTextInputLayout.isVisible = screenLogin == password
+                userTextInputLayout.isVisible = state == USER
+                passwordTextInputLayout.isVisible = state == PASSWORD
 
-            nextButton.isVisible = screenLogin == user
-            backButton.isVisible = screenLogin == password
-            loginButton.isVisible = screenLogin == password
-        },
+                nextButton.isVisible = state == USER
+                backButton.isVisible = state == PASSWORD
+                loginButton.isVisible = state == PASSWORD
+            },
 
-        loginViewModel.nextButtonEnabled.subscribe { nextEnabled ->
-            nextButton.isEnabled = nextEnabled == true
-        },
+            loginViewModel.nextButtonEnabled.subscribe { nextEnabled ->
+                nextButton.isEnabled = nextEnabled == true
+            },
 
-        loginViewModel.loginButtonEnabled.subscribe { loginEnabled ->
-            loginButton.isEnabled = loginEnabled == true
-        },
+            loginViewModel.loginButtonEnabled.subscribe { loginEnabled ->
+                loginButton.isEnabled = loginEnabled == true
+            },
 
-        loginViewModel.usernameHintColor.subscribe { colorHint ->
-            userTextInputLayout.hintTextColor =
-                ContextCompat.getColorStateList(activity!!, colorHint)
-        },
+            loginViewModel.usernameHintColor.subscribe { colorHint ->
+                userTextInputLayout.hintTextColor =
+                        ContextCompat.getColorStateList(activity!!, colorHint)
+            },
 
-        loginViewModel.passwordHintColor.subscribe { colorHint ->
-            passwordTextInputLayout.hintTextColor =
-                ContextCompat.getColorStateList(activity!!, colorHint)
-        },
+            loginViewModel.passwordHintColor.subscribe { colorHint ->
+                passwordTextInputLayout.hintTextColor =
+                        ContextCompat.getColorStateList(activity!!, colorHint)
+            },
 
-        loginViewModel.connectNetworkVisible.subscribe { connectNetworkVisible ->
-            noConnectTextView.isVisible = connectNetworkVisible
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                when (connectNetworkVisible) {
-                    true -> {
-                        activity!!.window.statusBarColor =
-                            ContextCompat.getColor(this.activity!!, R.color.colorDarkRed)
-                        activity!!.window.decorView.systemUiVisibility =
+            loginViewModel.connectNetworkFailedVisible.subscribe { connectNetworkFailedVisible ->
+                noConnectTextView.isVisible = connectNetworkFailedVisible
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    activity!!.window.statusBarColor = ContextCompat.getColor(
+                            this.activity!!,
+                            if (connectNetworkFailedVisible) R.color.colorDarkRed else R.color.blackTopPanel
+                    )
+
+                    if (connectNetworkFailedVisible) activity!!.window.decorView.systemUiVisibility =
                             View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                    }
-                    false -> {
+                    else
                         activity!!.window.decorView.systemUiVisibility = 0
-                        activity!!.window.statusBarColor =
-                            ContextCompat.getColor(activity!!, R.color.blackTopPanel)
-                    }
-
                 }
             }
-        }
     )
 
 }

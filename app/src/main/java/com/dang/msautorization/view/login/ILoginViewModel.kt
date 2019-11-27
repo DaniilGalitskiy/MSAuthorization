@@ -2,10 +2,11 @@ package com.dang.msautorization.view.login
 
 import com.dang.msautorization.view.ScreenLoginState
 import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 
 interface ILoginViewModel {
 
-    val state: Observable<ScreenLoginState>
+    val state: BehaviorSubject<ScreenLoginState>
 
     val nextButtonEnabled: Observable<Boolean>
     val loginButtonEnabled: Observable<Boolean>
@@ -13,7 +14,7 @@ interface ILoginViewModel {
     val usernameHintColor: Observable<Int>
     val passwordHintColor: Observable<Int>
 
-    val connectNetworkVisible: Observable<Boolean>
+    val connectNetworkFailedVisible: Observable<Boolean>
 
 
     fun onBackButtonClick()

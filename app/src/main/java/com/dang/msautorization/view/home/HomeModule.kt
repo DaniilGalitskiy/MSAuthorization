@@ -10,13 +10,14 @@ import ru.terrakok.cicerone.Router
 @Module
 class HomeModule(private val fragment: HomeFragment) {
 
-
     @Suppress("UNCHECKED_CAST")
     @Provides
-    fun vm(router: Router): IHomeViewModel = ViewModelProviders.of(fragment, object : ViewModelProvider.Factory {
+    fun vm(router: Router): IHomeViewModel =
+            ViewModelProviders.of(fragment, object : ViewModelProvider.Factory {
 
-        override fun <T : ViewModel?> create(modelClass: Class<T>) = HomeViewModel(router) as T
+                override fun <T : ViewModel?> create(modelClass: Class<T>) =
+                        HomeViewModel(router) as T
 
-    })[HomeViewModel::class.java]
+            })[HomeViewModel::class.java]
 
 }

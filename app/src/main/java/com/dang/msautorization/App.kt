@@ -6,16 +6,16 @@ import com.dang.msautorization.di.DaggerAppComponent
 
 class App : Application() {
 
-    companion object{
+    companion object {
         lateinit var component: AppComponent
     }
 
     override fun onCreate() {
         super.onCreate()
         component = DaggerAppComponent
-            .builder()
-            .context(this)
-            .build()
+                .builder()
+                .context(this)
+                .build()
     }
 
 }

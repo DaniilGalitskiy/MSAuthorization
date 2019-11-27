@@ -33,23 +33,23 @@ class AppModule {
     @Singleton
     fun authUserDao(context: Context): UserDao {
         return Room.databaseBuilder(context, DefAppDatabase::class.java, "github_authorization")
-            .fallbackToDestructiveMigration()
-            .build()
-            .getUserDao()
+                .fallbackToDestructiveMigration()
+                .build()
+                .getUserDao()
     }
 
     @Provides
     fun api(): Api {
         val okHttpClient = OkHttpClient().newBuilder()
-            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
-            .build()
+                .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+                .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .client(okHttpClient)
-            .build()
+                .baseUrl(URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .client(okHttpClient)
+                .build()
 
         return retrofit.create(Api::class.java)
     }

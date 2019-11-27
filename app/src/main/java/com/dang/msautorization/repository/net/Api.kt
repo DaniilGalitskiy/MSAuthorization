@@ -11,7 +11,7 @@ interface Api {
 //    @POST("users/DaniilGalitskiy")
 //    fun getPicture(): Call<Authorization>
 
-    @GET("basic")
-    fun getAuthorization(@Header("Authorization")authHeader: String): Call<Authorization>
+    @GET("login")
+    fun getAuthorization(@Header("Authorization") authHeader: String): Call<Authorization>
 
 }
