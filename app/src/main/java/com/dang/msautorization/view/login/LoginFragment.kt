@@ -35,16 +35,13 @@ class LoginFragment : MVVMFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val state: ScreenLoginState? = if (savedInstanceState?.containsKey(STATE_KEY) == true)
+            ScreenLoginState.values()[savedInstanceState.getInt(STATE_KEY)]
+        else null
+
         DaggerLoginComponent.builder()
                 .appComponent(App.component)
-                .loginModule(
-                        LoginModule(
-                                this,
-                                if (savedInstanceState?.containsKey(STATE_KEY) == true)
-                                    ScreenLoginState.values()[savedInstanceState.getInt(STATE_KEY)]
-                                else null
-                        )
-                )
+                .loginModule(LoginModule(this, state))
                 .build()
                 .inject(this)
     }
