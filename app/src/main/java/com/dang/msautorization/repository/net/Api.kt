@@ -8,10 +8,11 @@ import retrofit2.http.POST
 
 interface Api {
 
-//    @POST("users/DaniilGalitskiy")
-//    fun getPicture(): Call<Authorization>
+    companion object {
+        const val CONNECT_TIMEOUT: Long = 2500
+        const val URL: String = "https://api.github.com"
+    }
 
     @GET("login")
     fun getAuthorization(@Header("Authorization") authHeader: String): Call<Authorization>
-
 }

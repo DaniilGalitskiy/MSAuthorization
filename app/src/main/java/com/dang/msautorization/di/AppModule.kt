@@ -24,11 +24,6 @@ import javax.inject.Singleton
 @Module
 class AppModule {
 
-    companion object {
-        private const val CONNECT_TIMEOUT: Long = 2500
-        private const val URL: String = "https://api.github.com"
-    }
-
     @Provides
     @Singleton
     fun authUserDao(context: Context): UserDao {
@@ -41,11 +36,11 @@ class AppModule {
     @Provides
     fun api(): Api {
         val okHttpClient = OkHttpClient().newBuilder()
-                .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+                .connectTimeout(Api.CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .build()
 
         val retrofit = Retrofit.Builder()
-                .baseUrl(URL)
+                .baseUrl(Api.URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(okHttpClient)
