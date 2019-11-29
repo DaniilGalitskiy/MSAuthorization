@@ -21,9 +21,9 @@ interface AppComponent {
 
     fun sharedPrefs(): SharedPrefsScreen
 
-    fun userAuthorizationModel(): UserAuthorizationModel
-
     fun networkConnectModel(): NetworkConnectModel
+
+    fun userAuthorizationModel(): UserAuthorizationModel
 
     @Component.Builder
     interface Builder {

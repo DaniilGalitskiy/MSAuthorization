@@ -1,12 +1,23 @@
 package com.dang.msautorization.view.login
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.dang.msautorization.R
 import com.dang.msautorization.Screens
+import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
+import com.dang.msautorization.repository.db.entity.AuthorizationResult
+import com.dang.msautorization.repository.net.model.UserLogin
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
 import com.dang.msautorization.view.ScreenLoginState
 import io.reactivex.subjects.BehaviorSubject
+import okhttp3.Credentials
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.terrakok.cicerone.Router
 
 
@@ -14,9 +25,8 @@ class LoginViewModel(
         state: ScreenLoginState?,
         private val router: Router,
         private val sharedPrefsScreen: SharedPrefsScreen,
-        networkConnectModel:
-        NetworkConnectModel
-) : ViewModel(), ILoginViewModel {
+        networkConnectModel: NetworkConnectModel,
+        private val userAuthorizationModel: UserAuthorizationModel) : ViewModel(), ILoginViewModel {
 
     private val stateBehaviorSubject = BehaviorSubject.createDefault(state ?: ScreenLoginState.USER)
 
@@ -58,13 +68,39 @@ class LoginViewModel(
         }
     }
 
+    @SuppressLint("CheckResult")
     override fun onLoginButtonClick() {
-        if (sharedPrefsScreen.isHome()) {
+        val credential = Credentials.basic(
+                usernameBehaviorSubject.value.toString(),
+                passwordBehaviorSubject.value.toString()
+        )
+        val call: Call<AuthorizationResult> = userAuthorizationModel.setAuthorizationLogin(
+                credential,
+                UserLogin(
+                        "testovoe",
+                        arrayOf()
+                )
+        )
+        call.enqueue(object : Callback<AuthorizationResult> {
+            override fun onResponse(call: Call<AuthorizationResult>,
+                                    response: Response<AuthorizationResult>) {
+                if (response.isSuccessful)
+                    Log.d("TOKEN_TEST", response.body()!!.token)
+                else
+                    Log.d("TOKEN_TEST", "fail")
+            }
+
+            override fun onFailure(call: Call<AuthorizationResult>, t: Throwable) {
+                Log.d("TOKEN_TEST", t.toString())
+            }
+
+        })
+        /*if (sharedPrefsScreen.isHome()) {
             router.backTo(Screens.HomeScreen())
         } else {
             router.newRootScreen(Screens.HomeScreen())
             sharedPrefsScreen.setHome()
-        }
+        }*/
     }
 
     override fun onBackButtonClick() {

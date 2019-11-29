@@ -3,7 +3,7 @@ package com.dang.msautorization.view.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import com.dang.msautorization.domain.connect_network.DefNetworkConnectModel
+import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
 import com.dang.msautorization.view.ScreenLoginState
@@ -17,7 +17,8 @@ class LoginModule(private val fragment: LoginFragment, private val state: Screen
     @Provides
     fun vm(router: Router,
            sharedPrefsScreen: SharedPrefsScreen,
-           networkConnectModel: NetworkConnectModel): ILoginViewModel =
+           networkConnectModel: NetworkConnectModel,
+           userAuthorizationModel: UserAuthorizationModel): ILoginViewModel =
             ViewModelProviders.of(fragment, object : ViewModelProvider.Factory {
 
                 @Suppress("UNCHECKED_CAST")
@@ -25,7 +26,8 @@ class LoginModule(private val fragment: LoginFragment, private val state: Screen
                         state,
                         router,
                         sharedPrefsScreen,
-                        networkConnectModel
+                        networkConnectModel,
+                        userAuthorizationModel
                 ) as T
 
             })[LoginViewModel::class.java]

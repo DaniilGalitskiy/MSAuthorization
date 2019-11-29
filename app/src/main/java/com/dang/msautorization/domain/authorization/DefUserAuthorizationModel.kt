@@ -2,16 +2,14 @@ package com.dang.msautorization.domain.authorization
 
 import com.dang.msautorization.repository.db.dao.UserDao
 import com.dang.msautorization.repository.net.Api
-import com.dang.msautorization.repository.db.entity.Authorization
-import io.reactivex.Observable
+import com.dang.msautorization.repository.db.entity.AuthorizationResult
+import com.dang.msautorization.repository.net.model.UserLogin
+import retrofit2.Call
 
-class DefUserAuthorizationModel(userDao: UserDao, api: Api) : UserAuthorizationModel {
+class DefUserAuthorizationModel(private val db: UserDao, private val api: Api) : UserAuthorizationModel {
 
-    val db = userDao
-    val api = api
-
-    override fun getAll(): Observable<List<Authorization>> {
-        return db.getAll()
+    override fun setAuthorizationLogin(authorization: String, userLogin: UserLogin): Call<AuthorizationResult> {
+        return api.loginUser(authorization, userLogin)
     }
 
 }

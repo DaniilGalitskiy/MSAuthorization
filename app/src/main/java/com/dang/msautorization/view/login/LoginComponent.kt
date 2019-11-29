@@ -9,4 +9,5 @@ import dagger.Component
 interface LoginComponent {
 
     fun inject(fragment: LoginFragment)
+
 }
