@@ -70,10 +70,7 @@ class LoginFragment : MVVMFragment() {
     private fun init(view: View) {
         loginFailedSnackbar = Snackbar.make(view, "", Snackbar.LENGTH_LONG)
         loginFailedSnackbar.setBackgroundTint(
-                ContextCompat.getColor(
-                        activity!!,
-                        R.color.colorDarkRed
-                )
+                ContextCompat.getColor(activity!!, R.color.colorDarkRed)
         )
         loginFailedSnackbar.setTextColor(ContextCompat.getColor(activity!!, R.color.whiteTopPanel))
 

@@ -1,8 +1,5 @@
 package com.dang.msautorization.view.login
 
-import android.annotation.SuppressLint
-import android.content.res.Resources
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.dang.msautorization.R
 import com.dang.msautorization.Screens
