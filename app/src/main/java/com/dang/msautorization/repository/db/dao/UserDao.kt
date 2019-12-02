@@ -10,6 +10,9 @@ import io.reactivex.Observable
 @Dao
 interface UserDao {
 
+    @Query("SELECT COUNT(id) FROM AuthorizationResult WHERE name like '%'||:name||'%'")
+    fun getSignedUserByNameCount(name: String): Observable<Int>
+
     @Insert
     fun insert(authorizationResult: AuthorizationResult)
 

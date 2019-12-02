@@ -15,7 +15,8 @@ interface ILoginViewModel {
 
     val connectNetworkFailedVisible: Observable<Boolean>
 
-    val loginFailedTextException: Observable<Int>
+    val loginUserStateFailedTextException: Observable<Int>
+    val loginPasswordStateFailedTextException: Observable<Int>
 
 
     fun onBackButtonClick()

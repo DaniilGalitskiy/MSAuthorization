@@ -8,8 +8,10 @@ import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.db.entity.AuthorizationResult
 import com.dang.msautorization.repository.net.model.UserLogin
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -18,7 +20,6 @@ import okhttp3.Credentials
 import retrofit2.HttpException
 import ru.terrakok.cicerone.Router
 import java.net.UnknownHostException
-
 
 class LoginViewModel(
         state: ScreenLoginState?,
@@ -45,7 +46,9 @@ class LoginViewModel(
     private val passwordHintColorBehaviorSubject =
             BehaviorSubject.createDefault(R.color.colorAccent)
 
-    private val loginFailedSnackbarPublishSubject = PublishSubject.create<Int>()
+    private val loginUserStateFailedSnackbarPublishSubject = PublishSubject.create<Int>()
+    private val loginPasswordStateFailedSnackbarPublishSubject = PublishSubject.create<Int>()
+
 
     override val state get() = stateBehaviorSubject
 
@@ -58,15 +61,18 @@ class LoginViewModel(
     override val connectNetworkFailedVisible =
             networkConnectModel.isNetworkConnectedObservable.map { !it }!!
 
-    override val loginFailedTextException = loginFailedSnackbarPublishSubject
+    override val loginUserStateFailedTextException: Observable<Int>
+        get() = loginUserStateFailedSnackbarPublishSubject
 
+    override val loginPasswordStateFailedTextException =
+            loginPasswordStateFailedSnackbarPublishSubject
 
     override fun onSkipButtonClick() {
-        if (sharedPrefsScreen.isHome()) {
+        if (sharedPrefsScreen.isHome) {
             router.backTo(Screens.HomeScreen())
         } else {
             router.newRootScreen(Screens.HomeScreen())
-            sharedPrefsScreen.setHome()
+            sharedPrefsScreen.isHome = true
         }
     }
 
@@ -75,35 +81,34 @@ class LoginViewModel(
                 usernameBehaviorSubject.value.toString(),
                 passwordBehaviorSubject.value.toString()
         )
-        val call: Single<AuthorizationResult> = userAuthorizationModel.setAuthorizationLogin(
-                credential,
-                UserLogin()
-        )
+        val call: Single<AuthorizationResult> =
+                userAuthorizationModel.setAuthorizationLogin(credential, UserLogin())
 
         call.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : DisposableSingleObserver<AuthorizationResult>() {
-                    override fun onSuccess(t: AuthorizationResult) {
-                        if (sharedPrefsScreen.isHome()) {
+                    override fun onSuccess(authorizationResult: AuthorizationResult) {
+                        if (sharedPrefsScreen.isHome) {
                             router.backTo(Screens.HomeScreen())
                         } else {
                             router.newRootScreen(Screens.HomeScreen())
-                            sharedPrefsScreen.setHome()
+                            sharedPrefsScreen.isHome = true
                         }
                     }
 
                     override fun onError(e: Throwable) {
                         when (e) {
                             is HttpException ->
-                                loginFailedSnackbarPublishSubject.onNext(R.string.wrong_credentials)
+                                loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.wrong_credentials)
                             is UnknownHostException ->
-                                loginFailedSnackbarPublishSubject.onNext(R.string.check_your_connection)
+                                loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.check_your_connection)
                             else ->
-                                loginFailedSnackbarPublishSubject.onNext(R.string.unknown_exception)
+                                loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.unknown_exception)
                         }
                     }
 
                 })
+
     }
 
     override fun onBackButtonClick() {
@@ -111,7 +116,28 @@ class LoginViewModel(
     }
 
     override fun onNextButtonClick() {
-        state.onNext(ScreenLoginState.PASSWORD)
+        val checkSignedUser =
+                userAuthorizationModel.getSignedUserByNameCount(usernameBehaviorSubject.value!!)
+        checkSignedUser.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : DisposableObserver<Int>() {
+                    override fun onComplete() {
+
+                    }
+
+                    override fun onNext(signedUsersCount: Int) {
+                        if (signedUsersCount > 0)
+                            loginUserStateFailedSnackbarPublishSubject.onNext(R.string.you_are_already_signed_in)
+                        else
+                            state.onNext(ScreenLoginState.PASSWORD)
+                    }
+
+                    override fun onError(e: Throwable) {
+
+                    }
+
+                })
+
     }
 
     override fun onNextActionKeyboardClick() {

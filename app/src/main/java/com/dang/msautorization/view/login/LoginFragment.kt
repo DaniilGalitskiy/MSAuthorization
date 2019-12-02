@@ -197,7 +197,11 @@ class LoginFragment : MVVMFragment() {
                 }
             },
 
-            loginViewModel.loginFailedTextException.subscribe { textException ->
+            loginViewModel.loginUserStateFailedTextException.subscribe { textException ->
+                loginFailedSnackbar.setText(getString(textException)).show()
+            },
+
+            loginViewModel.loginPasswordStateFailedTextException.subscribe { textException ->
                 loginProgressBar.isVisible = false
                 backButton.isEnabled = true
                 loginButton.isEnabled = true

@@ -14,12 +14,10 @@ class DefSharedPrefsScreen(context: Context) : SharedPrefsScreen {
     private val prefs: SharedPreferences =
             context.getSharedPreferences(NAME_PREFS, Context.MODE_PRIVATE)
 
-    override fun isHome(): Boolean {
-        return prefs.getBoolean(KEY_HOME, false)
-    }
-
-    override fun setHome() {
-        val editor = prefs.edit()
-        editor.putBoolean(KEY_HOME, true).apply()
-    }
+    override var isHome: Boolean
+        get() = prefs.getBoolean(KEY_HOME, false)
+        set(value) {
+            val editor = prefs.edit()
+            editor.putBoolean(KEY_HOME, true).apply()
+        }
 }

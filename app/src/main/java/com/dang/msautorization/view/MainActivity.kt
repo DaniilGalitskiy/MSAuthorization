@@ -82,10 +82,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            if (sharedPrefsScreen.isHome())
-                router.newRootScreen(Screens.HomeScreen())
-            else
-                router.newRootScreen(Screens.LoginScreen())
+            router.newRootScreen(if (sharedPrefsScreen.isHome) Screens.HomeScreen() else Screens.LoginScreen())
         }
 
         registerReceiver(isNextworkConnectedReceiver, IntentFilter().apply {
