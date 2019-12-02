@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProviders
 import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
-import com.dang.msautorization.view.ScreenLoginState
 import dagger.Module
 import dagger.Provides
 import ru.terrakok.cicerone.Router

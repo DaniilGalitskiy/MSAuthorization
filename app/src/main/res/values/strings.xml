@@ -8,4 +8,7 @@
     <string name="login">Login</string>
     <string name="password">Password</string>
     <string name="no_network">No network</string>
+    <string name="wrong_credentials">Wrong credentials</string>
+    <string name="check_your_connection">Check your connection</string>
+    <string name="unknown_exception">Unknown exception</string>
 </resources>

@@ -1,9 +1,8 @@
 package com.dang.msautorization.view.login
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.content.res.Resources
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.dang.msautorization.R
 import com.dang.msautorization.Screens
@@ -12,13 +11,16 @@ import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.db.entity.AuthorizationResult
 import com.dang.msautorization.repository.net.model.UserLogin
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
-import com.dang.msautorization.view.ScreenLoginState
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import okhttp3.Credentials
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import retrofit2.HttpException
 import ru.terrakok.cicerone.Router
+import java.net.UnknownHostException
 
 
 class LoginViewModel(
@@ -46,6 +48,7 @@ class LoginViewModel(
     private val passwordHintColorBehaviorSubject =
             BehaviorSubject.createDefault(R.color.colorAccent)
 
+    private val loginFailedSnackbarPublishSubject = PublishSubject.create<Int>()
 
     override val state get() = stateBehaviorSubject
 
@@ -57,6 +60,8 @@ class LoginViewModel(
 
     override val connectNetworkFailedVisible =
             networkConnectModel.isNetworkConnectedObservable.map { !it }!!
+
+    override val loginFailedTextException = loginFailedSnackbarPublishSubject
 
 
     override fun onSkipButtonClick() {
@@ -74,33 +79,35 @@ class LoginViewModel(
                 usernameBehaviorSubject.value.toString(),
                 passwordBehaviorSubject.value.toString()
         )
-        val call: Call<AuthorizationResult> = userAuthorizationModel.setAuthorizationLogin(
+        val call: Single<AuthorizationResult> = userAuthorizationModel.setAuthorizationLogin(
                 credential,
-                UserLogin(
-                        "testovoe",
-                        arrayOf()
-                )
+                UserLogin()
         )
-        call.enqueue(object : Callback<AuthorizationResult> {
-            override fun onResponse(call: Call<AuthorizationResult>,
-                                    response: Response<AuthorizationResult>) {
-                if (response.isSuccessful)
-                    Log.d("TOKEN_TEST", response.body()!!.token)
-                else
-                    Log.d("TOKEN_TEST", "fail")
-            }
 
-            override fun onFailure(call: Call<AuthorizationResult>, t: Throwable) {
-                Log.d("TOKEN_TEST", t.toString())
-            }
+        call.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : DisposableSingleObserver<AuthorizationResult>() {
+                    override fun onSuccess(t: AuthorizationResult) {
+                        if (sharedPrefsScreen.isHome()) {
+                            router.backTo(Screens.HomeScreen())
+                        } else {
+                            router.newRootScreen(Screens.HomeScreen())
+                            sharedPrefsScreen.setHome()
+                        }
+                    }
 
-        })
-        /*if (sharedPrefsScreen.isHome()) {
-            router.backTo(Screens.HomeScreen())
-        } else {
-            router.newRootScreen(Screens.HomeScreen())
-            sharedPrefsScreen.setHome()
-        }*/
+                    override fun onError(e: Throwable) {
+                        when (e) {
+                            is HttpException ->
+                                loginFailedSnackbarPublishSubject.onNext(R.string.wrong_credentials)
+                            is UnknownHostException ->
+                                loginFailedSnackbarPublishSubject.onNext(R.string.check_your_connection)
+                            else ->
+                                loginFailedSnackbarPublishSubject.onNext(R.string.unknown_exception)
+                        }
+                    }
+
+                })
     }
 
     override fun onBackButtonClick() {

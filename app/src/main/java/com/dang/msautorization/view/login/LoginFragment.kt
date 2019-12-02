@@ -14,9 +14,9 @@ import androidx.core.view.isVisible
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.core.MVVMFragment
-import com.dang.msautorization.view.ScreenLoginState
-import com.dang.msautorization.view.ScreenLoginState.PASSWORD
-import com.dang.msautorization.view.ScreenLoginState.USER
+import com.dang.msautorization.view.login.ScreenLoginState.PASSWORD
+import com.dang.msautorization.view.login.ScreenLoginState.USER
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -31,6 +31,8 @@ class LoginFragment : MVVMFragment() {
         private const val animDuration: Long = 200
         private const val STATE_KEY = "STATE_KEY"
     }
+
+    private lateinit var loginFailedSnackbar: Snackbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +58,7 @@ class LoginFragment : MVVMFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init()
+        init(view)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -65,11 +67,21 @@ class LoginFragment : MVVMFragment() {
         outState.putInt(STATE_KEY, loginViewModel.state.value!!.ordinal)
     }
 
-    private fun init() {
+    private fun init(view: View) {
+        loginFailedSnackbar = Snackbar.make(view, "", Snackbar.LENGTH_LONG)
+        loginFailedSnackbar.setBackgroundTint(
+                ContextCompat.getColor(
+                        activity!!,
+                        R.color.colorDarkRed
+                )
+        )
+        loginFailedSnackbar.setTextColor(ContextCompat.getColor(activity!!, R.color.whiteTopPanel))
+
         skipButton.setOnClickListener {
             loginViewModel.onSkipButtonClick()
         }
         loginButton.setOnClickListener {
+            enableAndVisibleClickLogin()
             loginViewModel.onLoginButtonClick()
         }
         nextButton.setOnClickListener {
@@ -110,10 +122,19 @@ class LoginFragment : MVVMFragment() {
 
         passwordEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
+                enableAndVisibleClickLogin()
                 loginViewModel.onGoActionKeyboardClick()
             }
             false
         }
+    }
+
+    private fun enableAndVisibleClickLogin() {
+        loginProgressBar.isVisible = true
+        backButton.isEnabled = false
+        loginButton.isEnabled = false
+        skipButton.isEnabled = false
+        passwordTextInputLayout.isEnabled = false
     }
 
     override fun subscribe(): Disposable = CompositeDisposable(
@@ -177,6 +198,15 @@ class LoginFragment : MVVMFragment() {
                     else
                         activity!!.window.decorView.systemUiVisibility = 0
                 }
+            },
+
+            loginViewModel.loginFailedTextException.subscribe { textException ->
+                loginProgressBar.isVisible = false
+                backButton.isEnabled = true
+                loginButton.isEnabled = true
+                passwordTextInputLayout.isEnabled = true
+                skipButton.isEnabled = true
+                loginFailedSnackbar.setText(getString(textException)).show()
             }
     )
 

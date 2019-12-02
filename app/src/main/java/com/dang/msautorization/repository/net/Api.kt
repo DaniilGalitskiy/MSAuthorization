@@ -17,5 +17,5 @@ interface Api {
 
     //    @Header("Authorizations") credentials: String,
     @POST("authorizations")
-    fun loginUser(@Header("Authorization") authorization: String, @Body userLogin: UserLogin): Call<AuthorizationResult>
+    fun loginUser(@Header("Authorization") authorization: String, @Body userLogin: UserLogin): Single<AuthorizationResult>
 }

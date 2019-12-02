@@ -8,6 +8,16 @@
     android:orientation="vertical"
     tools:context=".view.MainActivity">
 
+    <ProgressBar
+        android:id="@+id/loginProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"/>
+
     <TextView
         android:id="@+id/noConnectTextView"
         android:layout_width="match_parent"
@@ -27,7 +37,7 @@
         android:background="@drawable/ripple_buttons"
         android:text="@string/skip"
         android:textAllCaps="false"
-        android:textColor="@color/colorAccent"
+        android:textColorHighlight="@color/colorAccent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/noConnectTextView" />
 

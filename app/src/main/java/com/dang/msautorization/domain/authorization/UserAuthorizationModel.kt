@@ -10,6 +10,6 @@ import retrofit2.Call
 
 interface UserAuthorizationModel {
 
-    fun setAuthorizationLogin(authorization: String, userLogin: UserLogin): Call<AuthorizationResult>
+    fun setAuthorizationLogin(authorization: String, userLogin: UserLogin): Single<AuthorizationResult>
 
 }
