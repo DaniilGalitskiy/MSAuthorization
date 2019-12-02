@@ -73,7 +73,6 @@ class LoginViewModel(
         }
     }
 
-    @SuppressLint("CheckResult")
     override fun onLoginButtonClick() {
         val credential = Credentials.basic(
                 usernameBehaviorSubject.value.toString(),
