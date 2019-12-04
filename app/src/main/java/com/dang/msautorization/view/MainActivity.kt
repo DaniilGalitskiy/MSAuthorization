@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.dang.msautorization.App
 import com.dang.msautorization.R
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity() {
                             R.anim.exit_to_bottom,
                             R.anim.enter_from_top
                     )
+                    else -> Log.d("TEST","OK")
                 }
             }
         }

@@ -1,20 +1,21 @@
 package com.dang.msautorization.repository.db.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.dang.msautorization.repository.db.entity.AuthorizationResult
+import com.dang.msautorization.repository.db.entity.AuthorizationUser
 import io.reactivex.Observable
 
 @Dao
 interface UserDao {
 
-    @Query("SELECT COUNT(id) FROM AuthorizationResult WHERE name like '%'||:name||'%'")
+    @Query("SELECT COUNT(id) FROM AuthorizationUser WHERE name like '%'||:name||'%'")
     fun getSignedUserByNameCount(name: String): Observable<Int>
 
-    @Insert
-    fun insert(authorizationResult: AuthorizationResult)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSignedResult(authorizationResult: AuthorizationResult)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSignedUser(authorizationUser: AuthorizationUser)
 
     @Delete
     fun delete(authorizationResult: AuthorizationResult)

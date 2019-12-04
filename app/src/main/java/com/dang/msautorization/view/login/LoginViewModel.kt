@@ -6,6 +6,7 @@ import com.dang.msautorization.Screens
 import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.db.entity.AuthorizationResult
+import com.dang.msautorization.repository.db.entity.AuthorizationUser
 import com.dang.msautorization.repository.net.model.UserLogin
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
 import io.reactivex.Observable
@@ -88,6 +89,13 @@ class LoginViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : DisposableSingleObserver<AuthorizationResult>() {
                     override fun onSuccess(authorizationResult: AuthorizationResult) {
+                        userAuthorizationModel.setAuthorizedUser(
+                                AuthorizationUser(
+                                        userId = authorizationResult.id,
+                                        name = usernameBehaviorSubject.value!!
+                                )
+                        )
+
                         if (sharedPrefsScreen.isHome) {
                             router.backTo(Screens.HomeScreen())
                         } else {
@@ -137,6 +145,7 @@ class LoginViewModel(
                     }
 
                 })
+        state.onNext(ScreenLoginState.PASSWORD)
 
     }
 

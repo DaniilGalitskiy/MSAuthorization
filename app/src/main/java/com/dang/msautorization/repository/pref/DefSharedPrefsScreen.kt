@@ -18,6 +18,6 @@ class DefSharedPrefsScreen(context: Context) : SharedPrefsScreen {
         get() = prefs.getBoolean(KEY_HOME, false)
         set(value) {
             val editor = prefs.edit()
-            editor.putBoolean(KEY_HOME, true).apply()
+            editor.putBoolean(KEY_HOME, value).apply()
         }
 }

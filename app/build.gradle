@@ -15,6 +15,8 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+        buildConfigField "String", "CLIENT_SECRET", CLIENT_SECRET
+        buildConfigField "String", "CLIENT_ID", CLIENT_ID
     }
     buildTypes {
         release {
