@@ -10,9 +10,7 @@ import io.reactivex.Single
 interface UserAuthorizationModel {
 
     fun setAuthorizationLogin(authorization: String,
-                              userLogin: UserLogin): Single<AuthorizationResult>
+                              userLogin: UserLogin, username: String): Single<AuthorizationResult>
 
     fun getSignedUserByNameCount(name: String): Observable<Int>
-
-    fun setAuthorizedUser(authorization: AuthorizationUser)
 }

@@ -83,19 +83,15 @@ class LoginViewModel(
                 passwordBehaviorSubject.value.toString()
         )
         val call: Single<AuthorizationResult> =
-                userAuthorizationModel.setAuthorizationLogin(credential, UserLogin())
-
+                userAuthorizationModel.setAuthorizationLogin(
+                        credential,
+                        UserLogin(),
+                        usernameBehaviorSubject.value!!
+                )
         call.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : DisposableSingleObserver<AuthorizationResult>() {
                     override fun onSuccess(authorizationResult: AuthorizationResult) {
-                        userAuthorizationModel.setAuthorizedUser(
-                                AuthorizationUser(
-                                        userId = authorizationResult.id,
-                                        name = usernameBehaviorSubject.value!!
-                                )
-                        )
-
                         if (sharedPrefsScreen.isHome) {
                             router.backTo(Screens.HomeScreen())
                         } else {
@@ -129,9 +125,7 @@ class LoginViewModel(
         checkSignedUser.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : DisposableObserver<Int>() {
-                    override fun onComplete() {
-
-                    }
+                    override fun onComplete() {}
 
                     override fun onNext(signedUsersCount: Int) {
                         if (signedUsersCount > 0)
@@ -140,12 +134,8 @@ class LoginViewModel(
                             state.onNext(ScreenLoginState.PASSWORD)
                     }
 
-                    override fun onError(e: Throwable) {
-
-                    }
-
+                    override fun onError(e: Throwable) {}
                 })
-        state.onNext(ScreenLoginState.PASSWORD)
 
     }
 
