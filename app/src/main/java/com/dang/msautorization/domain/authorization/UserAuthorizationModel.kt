@@ -12,5 +12,5 @@ interface UserAuthorizationModel {
     fun setAuthorizationLogin(authorization: String,
                               userLogin: UserLogin, username: String): Single<AuthorizationResult>
 
-    fun getSignedUserByNameCount(name: String): Observable<Int>
+    fun getSignedUserByNameCount(name: String): Single<Int>
 }

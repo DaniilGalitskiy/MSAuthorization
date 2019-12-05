@@ -2,8 +2,8 @@ package com.dang.msautorization.di
 
 import android.content.Context
 import androidx.room.Room
-import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.authorization.DefUserAuthorizationModel
+import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.DefNetworkConnectModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.db.AppDatabase
@@ -25,11 +25,13 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun userDao(context: Context): UserDao =
+    fun db(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "github_authorization")
                     .fallbackToDestructiveMigration()
                     .build()
-                    .getUserDao()
+
+    @Provides
+    fun userDao(db: AppDatabase): UserDao = db.getUserDao()
 
     @Provides
     fun api(): Api {

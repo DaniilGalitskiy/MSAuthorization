@@ -121,10 +121,8 @@ class LoginViewModel(
         userAuthorizationModel.getSignedUserByNameCount(usernameBehaviorSubject.value!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : DisposableObserver<Int>() {
-                    override fun onComplete() {}
-
-                    override fun onNext(signedUsersCount: Int) {
+                .subscribe(object : DisposableSingleObserver<Int>() {
+                    override fun onSuccess(signedUsersCount: Int) {
                         if (signedUsersCount > 0)
                             loginUserStateFailedSnackbarPublishSubject.onNext(R.string.you_are_already_signed_in)
                         else

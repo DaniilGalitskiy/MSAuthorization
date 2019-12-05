@@ -186,11 +186,8 @@ class LoginFragment : MVVMFragment() {
                             this.activity!!,
                             if (connectNetworkFailedVisible) R.color.colorDarkRed else R.color.blackTopPanel
                     )
-
-                    if (connectNetworkFailedVisible) activity!!.window.decorView.systemUiVisibility =
-                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                    else
-                        activity!!.window.decorView.systemUiVisibility = 0
+                    activity!!.window.decorView.systemUiVisibility =
+                            if (connectNetworkFailedVisible) View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR else 0
                 }
             },
 

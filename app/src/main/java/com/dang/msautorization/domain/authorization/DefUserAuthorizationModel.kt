@@ -26,6 +26,6 @@ class DefUserAuthorizationModel(private val db: UserDao, private val api: Api) :
 
                     }
 
-    override fun getSignedUserByNameCount(name: String): Observable<Int> =
+    override fun getSignedUserByNameCount(name: String): Single<Int> =
             db.getSignedUserByNameCount(name)
 }

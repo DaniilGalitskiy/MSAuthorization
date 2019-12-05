@@ -8,6 +8,8 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.Screens
@@ -36,12 +38,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var networkConnectedModel: NetworkConnectModel
 
     private val navigator = object : SupportAppNavigator(this, R.id.mainContainer) {
-        override fun setupFragmentTransaction(
-                command: Command?,
-                currentFragment: androidx.fragment.app.Fragment?,
-                nextFragment: androidx.fragment.app.Fragment?,
-                fragmentTransaction: androidx.fragment.app.FragmentTransaction?
-        ) {
+        override fun setupFragmentTransaction(command: Command?,
+                                              currentFragment: Fragment?,
+                                              nextFragment: Fragment?,
+                                              fragmentTransaction: FragmentTransaction?) {
             super.setupFragmentTransaction(
                     command,
                     currentFragment,
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
                             R.anim.exit_to_bottom,
                             R.anim.enter_from_top
                     )
-                    else -> Log.d("TEST","OK")
+                    else -> Log.d("TEST", "OK")
                 }
             }
         }
