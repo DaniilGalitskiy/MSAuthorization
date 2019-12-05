@@ -7,7 +7,5 @@ import dagger.Component
 @ModuleScope
 @Component(modules = [(LoginModule::class)], dependencies = [(AppComponent::class)])
 interface LoginComponent {
-
     fun inject(fragment: LoginFragment)
-
 }

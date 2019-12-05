@@ -8,7 +8,5 @@ import com.dang.msautorization.repository.db.entity.User
 
 @Database(entities = [AuthorizationUser::class, User::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-
     abstract fun getUserDao(): UserDao
-
 }

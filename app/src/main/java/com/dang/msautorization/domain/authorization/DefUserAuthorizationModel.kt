@@ -13,21 +13,19 @@ class DefUserAuthorizationModel(private val db: UserDao, private val api: Api) :
 
     override fun setAuthorizationLogin(authorization: String,
                                        userLogin: UserLogin,
-                                       username: String): Single<AuthorizationResult> {
+                                       username: String): Single<AuthorizationResult> =
+            api.loginUser(authorization, userLogin)
+                    .doOnSuccess {
+                        db.insertAuthorizationUser(
+                                AuthorizationUser(
+                                        id = it.id,
+                                        token = it.token,
+                                        name = username
+                                )
+                        )
 
-        return api.loginUser(authorization, userLogin)
-                .doOnSuccess {
-                    db.insertAuthorizationUser(
-                            AuthorizationUser(
-                                    id = it.id,
-                                    token = it.token,
-                                    name = username
-                            )
-                    )
-                }
-    }
+                    }
 
-    override fun getSignedUserByNameCount(name: String): Observable<Int> {
-        return db.getSignedUserByNameCount(name)
-    }
+    override fun getSignedUserByNameCount(name: String): Observable<Int> =
+            db.getSignedUserByNameCount(name)
 }

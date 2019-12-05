@@ -82,13 +82,11 @@ class LoginViewModel(
                 usernameBehaviorSubject.value.toString(),
                 passwordBehaviorSubject.value.toString()
         )
-        val call: Single<AuthorizationResult> =
-                userAuthorizationModel.setAuthorizationLogin(
-                        credential,
-                        UserLogin(),
-                        usernameBehaviorSubject.value!!
-                )
-        call.subscribeOn(Schedulers.io())
+        userAuthorizationModel.setAuthorizationLogin(
+                credential,
+                UserLogin(),
+                usernameBehaviorSubject.value!!
+        ).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : DisposableSingleObserver<AuthorizationResult>() {
                     override fun onSuccess(authorizationResult: AuthorizationResult) {
@@ -120,9 +118,8 @@ class LoginViewModel(
     }
 
     override fun onNextButtonClick() {
-        val checkSignedUser =
-                userAuthorizationModel.getSignedUserByNameCount(usernameBehaviorSubject.value!!)
-        checkSignedUser.subscribeOn(Schedulers.io())
+        userAuthorizationModel.getSignedUserByNameCount(usernameBehaviorSubject.value!!)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : DisposableObserver<Int>() {
                     override fun onComplete() {}
@@ -136,7 +133,6 @@ class LoginViewModel(
 
                     override fun onError(e: Throwable) {}
                 })
-
     }
 
     override fun onNextActionKeyboardClick() {

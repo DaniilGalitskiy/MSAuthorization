@@ -25,12 +25,11 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun userDao(context: Context): UserDao {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "github_authorization")
-                .fallbackToDestructiveMigration()
-                .build()
-                .getUserDao()
-    }
+    fun userDao(context: Context): UserDao =
+            Room.databaseBuilder(context, AppDatabase::class.java, "github_authorization")
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .getUserDao()
 
     @Provides
     fun api(): Api {
@@ -50,20 +49,15 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun defSharedPrefsRepo(context: Context): SharedPrefsScreen {
-        return DefSharedPrefsScreen(context)
-    }
+    fun defSharedPrefsRepo(context: Context): SharedPrefsScreen = DefSharedPrefsScreen(context)
 
     @Provides
     @Singleton
-    fun defUserAuthorizationModel(userDao: UserDao, api: Api): UserAuthorizationModel {
-        return DefUserAuthorizationModel(userDao, api)
-    }
+    fun defUserAuthorizationModel(userDao: UserDao, api: Api): UserAuthorizationModel =
+            DefUserAuthorizationModel(userDao, api)
 
     @Provides
     @Singleton
-    fun defNetworkConnectModel(): NetworkConnectModel {
-        return DefNetworkConnectModel()
-    }
+    fun defNetworkConnectModel(): NetworkConnectModel = DefNetworkConnectModel()
 
 }

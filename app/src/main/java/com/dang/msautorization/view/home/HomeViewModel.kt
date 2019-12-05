@@ -9,5 +9,4 @@ class HomeViewModel(private val router: Router) : ViewModel(), IHomeViewModel {
     override fun onAccountPictureClick() {
         router.navigateTo(Screens.LoginScreen())
     }
-
 }
