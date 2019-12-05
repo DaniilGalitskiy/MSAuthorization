@@ -15,7 +15,7 @@ data class AuthorizationResult(
         foreignKeys = [ForeignKey(
                 entity = AuthorizationResult::class,
                 parentColumns = ["id"],
-                childColumns = ["userId"],
+                childColumns = ["resultId"],
                 onDelete = CASCADE
         )]
 )
