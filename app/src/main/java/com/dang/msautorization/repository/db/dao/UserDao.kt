@@ -1,8 +1,8 @@
 package com.dang.msautorization.repository.db.dao
 
 import androidx.room.*
-import com.dang.msautorization.repository.db.entity.AuthorizationResult
 import com.dang.msautorization.repository.db.entity.AuthorizationUser
+import com.dang.msautorization.repository.db.entity.User
 import io.reactivex.Observable
 
 @Dao
@@ -12,11 +12,9 @@ interface UserDao {
     fun getSignedUserByNameCount(name: String): Observable<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSignedResult(authorizationResult: AuthorizationResult)
+    fun insertAuthorizationUser(authorizationUser: AuthorizationUser)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSignedUser(authorizationUser: AuthorizationUser)
+    fun insertUser(authorizationUser: User)
 
-    @Delete
-    fun delete(authorizationResult: AuthorizationResult)
 }
