@@ -21,7 +21,5 @@ data class User(
         val authorizationUserId: Long = 0,
         val name: String,
         @SerializedName("avatar_url")
-        val avatarUrl: String,
-        @SerializedName("is_active")
-        val isActive: Boolean = true
+        val avatarUrl: String
 )
