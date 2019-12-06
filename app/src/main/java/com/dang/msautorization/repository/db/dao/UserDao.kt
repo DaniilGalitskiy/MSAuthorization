@@ -11,8 +11,11 @@ import io.reactivex.Single
 @Dao
 interface UserDao {
 
-    @Query("SELECT COUNT(id) FROM AuthorizationUser WHERE name like '%'||:name||'%'")
-    fun getSignedUserByNameCount(name: String): Single<Int>
+    @Query("SELECT COUNT(id) FROM AuthorizationUser WHERE name like :name limit 1")
+    fun isSignedUserByName(name: String): Single<Int>
+
+    @Query("SELECT COUNT(id) FROM AuthorizationUser limit 1")
+    fun isSignedUser(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAuthorizationUser(authorizationUser: AuthorizationUser)

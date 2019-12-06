@@ -6,13 +6,10 @@ import com.dang.msautorization.Screens
 import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.db.entity.AuthorizationResult
-import com.dang.msautorization.repository.db.entity.AuthorizationUser
 import com.dang.msautorization.repository.net.model.UserLogin
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -118,12 +115,13 @@ class LoginViewModel(
     }
 
     override fun onNextButtonClick() {
-        userAuthorizationModel.getSignedUserByNameCount(usernameBehaviorSubject.value!!)
+        userAuthorizationModel.isSignedUserByName(usernameBehaviorSubject.value!!)
+                .map { it > 0 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : DisposableSingleObserver<Int>() {
-                    override fun onSuccess(signedUsersCount: Int) {
-                        if (signedUsersCount > 0)
+                .subscribe(object : DisposableSingleObserver<Boolean>() {
+                    override fun onSuccess(isSingleUser: Boolean) {
+                        if (isSingleUser)
                             loginUserStateFailedSnackbarPublishSubject.onNext(R.string.you_are_already_signed_in)
                         else
                             state.onNext(ScreenLoginState.PASSWORD)

@@ -7,13 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.dang.msautorization.App
 import com.dang.msautorization.R
+import com.dang.msautorization.core.MVVMFragment
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_home.*
 import javax.inject.Inject
 
-class HomeFragment : Fragment() {
+class HomeFragment : MVVMFragment() {
 
     @Inject
     lateinit var homeViewModel: IHomeViewModel
@@ -53,4 +55,10 @@ class HomeFragment : Fragment() {
             homeViewModel.onAccountPictureClick()
         }
     }
+
+    private fun showDialog(logoutUserName: String) {
+    }
+
+    override fun subscribe(): Disposable = CompositeDisposable(
+    )
 }
