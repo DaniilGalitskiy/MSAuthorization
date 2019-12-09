@@ -6,6 +6,10 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+data class UserResult(val id: Long,
+                      val login: String,
+                      @SerializedName("avatar_url") val avatarUrl: String)
+
 @Entity(
         indices = [Index(value = ["authorizationUserId"], unique = true)],
         foreignKeys = [ForeignKey(

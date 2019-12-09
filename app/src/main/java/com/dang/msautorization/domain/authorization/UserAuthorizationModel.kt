@@ -10,7 +10,6 @@ interface UserAuthorizationModel {
     fun setAuthorizationLogin(authorization: String,
                               userLogin: UserLogin, username: String): Single<AuthorizationResult>
 
-    fun isSignedUserByName(name: String): Single<Int>
 
-    fun isSignedUser(): Int
+    fun isSignedUserByName(name: String): Single<Int>
 }

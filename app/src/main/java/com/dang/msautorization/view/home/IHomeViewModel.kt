@@ -4,9 +4,9 @@ import io.reactivex.Observable
 
 interface IHomeViewModel {
 
-    val circleImageUser: Observable<Int>
     val logOutDialogVisible: Observable<Boolean>
     val bottomAccountSheetVisible: Observable<Boolean>
+    val circleAvatarUrl: Observable<String>
 
 
     fun onAccountPictureClick()

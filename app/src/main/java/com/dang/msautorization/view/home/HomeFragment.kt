@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.core.MVVMFragment
+import com.squareup.picasso.Picasso
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -57,8 +58,24 @@ class HomeFragment : MVVMFragment() {
     }
 
     private fun showDialog(logoutUserName: String) {
+        /*if (visible){
+            val adb: AlertDialog.Builder = AlertDialog.Builder(activity!!)
+                    .setCancelable(true)
+                    .setMessage(getString(R.string.do_you_really_want_to_log_out_from, "tester"))
+                    .setPositiveButton(getString(R.string.logout)) { dialog, _ -> dialog!!.dismiss() }
+                    .setNegativeButton("cancel") { dialog, _ -> dialog!!.cancel(); dialog.dismiss() }
+
+            val alertDialog = adb.create()
+            alertDialog.show()
+        }*/
     }
 
     override fun subscribe(): Disposable = CompositeDisposable(
+            homeViewModel.circleAvatarUrl.subscribe { avatarUrl ->
+                Picasso.get()
+                        .load(avatarUrl)
+                        .placeholder(R.drawable.ic_account_unknown)
+                        .into(accountImage)
+            }
     )
 }
