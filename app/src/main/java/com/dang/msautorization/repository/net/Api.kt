@@ -3,6 +3,7 @@ package com.dang.msautorization.repository.net
 import com.dang.msautorization.repository.db.entity.AuthorizationResult
 import com.dang.msautorization.repository.db.entity.UserResult
 import com.dang.msautorization.repository.net.model.UserLogin
+import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.*
 
@@ -18,4 +19,7 @@ interface Api {
 
     @GET("user")
     fun userInfo(@Query("access_token") token: String): Single<UserResult>
+
+    @DELETE("authorizations/{id}")
+    fun deleteAuthorizationToken(@Header("Authorization") authorization: String, @Path("id") token: Long): Completable
 }

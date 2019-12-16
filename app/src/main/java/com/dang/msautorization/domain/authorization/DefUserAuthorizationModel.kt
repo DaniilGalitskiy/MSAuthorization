@@ -1,8 +1,8 @@
 package com.dang.msautorization.domain.authorization
 
 import com.dang.msautorization.repository.db.dao.UserDao
+import com.dang.msautorization.repository.db.entity.Authorization
 import com.dang.msautorization.repository.db.entity.AuthorizationResult
-import com.dang.msautorization.repository.db.entity.AuthorizationUser
 import com.dang.msautorization.repository.net.Api
 import com.dang.msautorization.repository.net.model.UserLogin
 import io.reactivex.Single
@@ -10,17 +10,18 @@ import io.reactivex.Single
 class DefUserAuthorizationModel(private val db: UserDao, private val api: Api) :
         UserAuthorizationModel {
 
-    override fun setAuthorizationLogin(authorization: String,
+    override fun setAuthorizationLogin(credential: String,
                                        userLogin: UserLogin,
                                        username: String): Single<AuthorizationResult> =
-            api.loginUser(authorization, userLogin)
+            api.loginUser(credential, userLogin)
                     .doOnSuccess {
-                        db.updateNotAuthorizedUser()
+                        db.updateClearAuthorizations()
                         db.insertAuthorizationUser(
-                                AuthorizationUser(
+                                Authorization(
                                         id = it.id,
                                         token = it.token,
-                                        name = username
+                                        name = username,
+                                        credential = credential
                                 )
                         )
 

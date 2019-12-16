@@ -13,7 +13,7 @@ data class UserResult(val id: Long,
 @Entity(
         indices = [Index(value = ["authorizationUserId"], unique = true)],
         foreignKeys = [ForeignKey(
-                entity = AuthorizationUser::class,
+                entity = Authorization::class,
                 parentColumns = ["id"],
                 childColumns = ["authorizationUserId"],
                 onDelete = ForeignKey.CASCADE
@@ -24,6 +24,7 @@ data class User(
         @SerializedName("authorization_user_id")
         val authorizationUserId: Long = 0,
         val name: String,
+        val credential: String,
         @SerializedName("avatar_url")
         val avatarUrl: String
 )

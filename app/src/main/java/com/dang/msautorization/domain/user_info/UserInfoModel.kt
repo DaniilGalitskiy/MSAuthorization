@@ -1,16 +1,18 @@
 package com.dang.msautorization.domain.user_info
 
-import com.dang.msautorization.repository.db.entity.AuthorizationUser
-import com.dang.msautorization.repository.db.entity.User
+import com.dang.msautorization.domain.user_info.entity.DynamicUser
 import io.reactivex.Completable
 import io.reactivex.Observable
 
 interface UserInfoModel {
 
-    fun getCurrentUser(): Observable<User>
+    fun getCurrentUser(): Observable<DynamicUser>
 
-    fun getAllAuthorized(): Observable<List<AuthorizationUser>>
+    fun getAllUsers(): Observable<List<DynamicUser>>
 
-    fun updateUsersInfo(): Completable
+    fun updateClearAndInsertAuthorizations(): Completable
 
+    fun updateClearAndSetCurrentUserById(id: Long): Completable
+
+    fun deleteUserById(dynamicUser: DynamicUser): Completable
 }

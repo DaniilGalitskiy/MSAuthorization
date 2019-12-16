@@ -1,34 +1,72 @@
 package com.dang.msautorization.repository.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.dang.msautorization.repository.db.entity.AuthorizationUser
+import androidx.room.*
+import com.dang.msautorization.repository.db.entity.Authorization
 import com.dang.msautorization.repository.db.entity.User
+import com.dang.msautorization.repository.db.tuple.UserTuple
 import io.reactivex.Observable
 import io.reactivex.Single
 
 @Dao
 interface UserDao {
 
-    @Query("SELECT COUNT(id) FROM AuthorizationUser WHERE name like :name limit 1")
+    @Query("SELECT COUNT(id) FROM Authorization WHERE name like :name limit 1")
     fun isSignedUserByName(name: String): Single<Int>
 
-    @Query("SELECT * FROM AuthorizationUser")
-    fun getAuthorizationUsers(): Observable<List<AuthorizationUser>>
 
-    @Query("UPDATE AuthorizationUser SET isActive = 0 WHERE isActive = 1")
-    fun updateNotAuthorizedUser()
+    @Query("SELECT * FROM Authorization")
+    fun getAllAuthorizations(): Observable<List<Authorization>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAuthorizationUser(authorizationUser: AuthorizationUser)
+    fun insertAuthorizationUser(authorization: Authorization)
 
 
-    @Query("SELECT * FROM User INNER JOIN AuthorizationUser ON User.authorizationUserId = AuthorizationUser.id WHERE AuthorizationUser.isActive = 1")
-    fun getCurrentUser(): Observable<User>
+    @Transaction
+    fun clearAndSetCurrentUserById(id: Long) {
+        updateClearAuthorizations()
+        updateCurrentAuthorizations(id)
+    }
+
+    @Query("UPDATE Authorization SET isActive = 1 WHERE id = :id")
+    fun updateCurrentAuthorizations(id: Long)
+
+    @Query("UPDATE Authorization SET isActive = 0 WHERE isActive = 1")
+    fun updateClearAuthorizations()
+
+
+    @Query(
+            """SELECT Authorization.id as id, User.name as name, User.avatarUrl as avatar, Authorization.isActive as is_active 
+        FROM Authorization 
+        LEFT JOIN User ON Authorization.id = User.authorizationUserId
+        WHERE Authorization.isActive = 1"""
+    )
+    fun getCurrentUser(): Observable<UserTuple>
+
+    @Query(
+            """SELECT Authorization.id as id, User.name as name, User.avatarUrl as avatar, Authorization.isActive as is_active
+        FROM Authorization
+        LEFT JOIN User ON Authorization.id = User.authorizationUserId
+        ORDER BY User.name"""
+    )
+    fun getAllUsers(): Observable<List<UserTuple>>
+
+
+    @Transaction
+    fun deleteCurrentUserAndSetNewCurrent(id: Long) {
+        deleteUserById(id)
+        updateFirstUserActive(getFirstId())
+    }
+
+    @Query("DELETE FROM Authorization WHERE id = :id")
+    fun deleteUserById(id: Long)
+
+    @Query("UPDATE Authorization SET isActive = 1 WHERE id = :firstId")
+    fun updateFirstUserActive(firstId: Int)
+
+    @Query("SELECT id FROM Authorization LIMIT 1")
+    fun getFirstId(): Int
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUser(user: User)
-
 }

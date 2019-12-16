@@ -7,7 +7,7 @@ import io.reactivex.Single
 
 interface UserAuthorizationModel {
 
-    fun setAuthorizationLogin(authorization: String,
+    fun setAuthorizationLogin(credential: String,
                               userLogin: UserLogin, username: String): Single<AuthorizationResult>
 
 

@@ -6,20 +6,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dang.msautorization.App
 import com.dang.msautorization.R
+import com.dang.msautorization.adapter.SignedUsersAdapter
 import com.dang.msautorization.core.MVVMFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.picasso.Picasso
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_home.*
 import javax.inject.Inject
 
+
 class HomeFragment : MVVMFragment() {
 
     @Inject
     lateinit var homeViewModel: IHomeViewModel
+
+    private lateinit var bottomSheetDialog: BottomSheetDialog
+    private lateinit var alertDialog: AlertDialog
+    private val signedUsersAdapter =
+            SignedUsersAdapter(
+                    { user -> homeViewModel.onChangeAccountBottomSheetClick(user) },
+                    { user -> homeViewModel.onLogoutBottomSheetClick(user) }
+            )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,19 +71,28 @@ class HomeFragment : MVVMFragment() {
         accountImage.setOnClickListener {
             homeViewModel.onAccountPictureClick()
         }
-    }
 
-    private fun showDialog(logoutUserName: String) {
-        /*if (visible){
-            val adb: AlertDialog.Builder = AlertDialog.Builder(activity!!)
-                    .setCancelable(true)
-                    .setMessage(getString(R.string.do_you_really_want_to_log_out_from, "tester"))
-                    .setPositiveButton(getString(R.string.logout)) { dialog, _ -> dialog!!.dismiss() }
-                    .setNegativeButton("cancel") { dialog, _ -> dialog!!.cancel(); dialog.dismiss() }
+        bottomSheetDialog = BottomSheetDialog(activity!!)
+        val sheetView: View = activity!!.layoutInflater
+                .inflate(R.layout.dialog_bottom_sheet_home, null)
+        bottomSheetDialog.setContentView(sheetView)
+        bottomSheetDialog.setOnCancelListener { homeViewModel.onAccountBottomSheetDialogDismiss() }
 
-            val alertDialog = adb.create()
-            alertDialog.show()
-        }*/
+        val bottomHomeRecyclerView =
+                sheetView.findViewById(R.id.bottomHomeRecyclerView) as RecyclerView
+        bottomHomeRecyclerView.layoutManager = LinearLayoutManager(activity)
+        bottomHomeRecyclerView.itemAnimator = DefaultItemAnimator()
+        bottomHomeRecyclerView.adapter = signedUsersAdapter
+
+        sheetView.findViewById<LinearLayout>(R.id.addAccountBottomSheetLinear)
+                .setOnClickListener { homeViewModel.onAddAccountBottomSheetClick() }
+
+        val adb: AlertDialog.Builder = AlertDialog.Builder(activity!!)
+                .setCancelable(true)
+                .setMessage(getString(R.string.do_you_really_want_to_log_out_from, "tester"))
+                .setPositiveButton(getString(R.string.logout)) { dialog, _ -> dialog!!.dismiss() }
+                .setNegativeButton("cancel") { dialog, _ -> dialog!!.cancel(); dialog.dismiss() }
+        alertDialog = adb.create()
     }
 
     override fun subscribe(): Disposable = CompositeDisposable(
@@ -76,6 +101,14 @@ class HomeFragment : MVVMFragment() {
                         .load(avatarUrl)
                         .placeholder(R.drawable.ic_account_unknown)
                         .into(accountImage)
+            },
+            homeViewModel.isBottomAccountSheetVisible.subscribe { isVisible ->
+                if (isVisible)
+                    bottomSheetDialog.show() else
+                    bottomSheetDialog.dismiss()
+            },
+            homeViewModel.signedUsers.subscribe { listUsers ->
+                signedUsersAdapter.submitList(listUsers)
             }
     )
 }

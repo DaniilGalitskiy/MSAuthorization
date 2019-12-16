@@ -7,10 +7,11 @@ import com.google.gson.annotations.SerializedName
 data class AuthorizationResult(val id: Long, val token: String)
 
 @Entity
-data class AuthorizationUser(
+data class Authorization(
         @PrimaryKey val id: Long,
         val name: String,
         val token: String,
+        val credential: String,
         @SerializedName("is_active")
         val isActive: Boolean = true
 )
