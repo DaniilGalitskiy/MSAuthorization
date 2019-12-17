@@ -35,18 +35,9 @@ interface UserDao {
 
 
     @Query(
-            """SELECT Authorization.id as id, User.name as name, User.avatarUrl as avatar, Authorization.isActive as is_active 
-        FROM Authorization 
-        LEFT JOIN User ON Authorization.id = User.authorizationUserId
-        WHERE Authorization.isActive = 1"""
-    )
-    fun getCurrentUser(): Observable<UserTuple>
-
-    @Query(
-            """SELECT Authorization.id as id, User.name as name, User.avatarUrl as avatar, Authorization.isActive as is_active
+            """SELECT Authorization.id as id, User.name as name, User.credential as credential, User.avatarUrl as avatar, Authorization.isActive as is_active
         FROM Authorization
-        LEFT JOIN User ON Authorization.id = User.authorizationUserId
-        ORDER BY User.name"""
+        LEFT JOIN User ON Authorization.id = User.authorizationUserId"""
     )
     fun getAllUsers(): Observable<List<UserTuple>>
 

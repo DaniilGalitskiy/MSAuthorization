@@ -6,16 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.animation.AnimationUtils
+import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dang.msautorization.App
 import com.dang.msautorization.R
 import com.dang.msautorization.adapter.SignedUsersAdapter
 import com.dang.msautorization.core.MVVMFragment
+import com.dang.msautorization.utilities.OnSwipeTouchListener
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.picasso.Picasso
 import io.reactivex.disposables.CompositeDisposable
@@ -30,10 +33,10 @@ class HomeFragment : MVVMFragment() {
     lateinit var homeViewModel: IHomeViewModel
 
     private lateinit var bottomSheetDialog: BottomSheetDialog
-    private lateinit var alertDialog: AlertDialog
+    private lateinit var logoutAlertDialog: AlertDialog
     private val signedUsersAdapter =
             SignedUsersAdapter(
-                    { user -> homeViewModel.onChangeAccountBottomSheetClick(user) },
+                    { user -> homeViewModel.onAccountBottomSheetClick(user) },
                     { user -> homeViewModel.onLogoutBottomSheetClick(user) }
             )
 
@@ -76,31 +79,58 @@ class HomeFragment : MVVMFragment() {
         val sheetView: View = activity!!.layoutInflater
                 .inflate(R.layout.dialog_bottom_sheet_home, null)
         bottomSheetDialog.setContentView(sheetView)
-        bottomSheetDialog.setOnCancelListener { homeViewModel.onAccountBottomSheetDialogDismiss() }
+        bottomSheetDialog.setOnDismissListener { homeViewModel.onAccountBottomSheetDialogDismiss() }
 
         val bottomHomeRecyclerView =
                 sheetView.findViewById(R.id.bottomHomeRecyclerView) as RecyclerView
         bottomHomeRecyclerView.layoutManager = LinearLayoutManager(activity)
-        bottomHomeRecyclerView.itemAnimator = DefaultItemAnimator()
         bottomHomeRecyclerView.adapter = signedUsersAdapter
 
         sheetView.findViewById<LinearLayout>(R.id.addAccountBottomSheetLinear)
                 .setOnClickListener { homeViewModel.onAddAccountBottomSheetClick() }
 
-        val adb: AlertDialog.Builder = AlertDialog.Builder(activity!!)
+        val adb: AlertDialog.Builder = AlertDialog.Builder(
+                ContextThemeWrapper(
+                        activity!!,
+                        R.style.AlertDialog_AppCompat_MyDialog
+                )
+        )
                 .setCancelable(true)
-                .setMessage(getString(R.string.do_you_really_want_to_log_out_from, "tester"))
-                .setPositiveButton(getString(R.string.logout)) { dialog, _ -> dialog!!.dismiss() }
-                .setNegativeButton("cancel") { dialog, _ -> dialog!!.cancel(); dialog.dismiss() }
-        alertDialog = adb.create()
+                .setPositiveButton(getString(R.string.logout)) { dialog, _ ->
+                    dialog!!.dismiss()
+                    homeViewModel.onLogoutAlertDialogClick()
+                }
+                .setNegativeButton("cancel") { dialog, _ ->
+                    dialog!!.cancel(); dialog.dismiss()
+                }
+                .setOnDismissListener {
+                    homeViewModel.onDismissLogoutAlertDialogClick()
+                }
+        logoutAlertDialog = adb.create()
+
+        accountImage.setOnTouchListener(object : OnSwipeTouchListener() {
+            override fun onSwipeTop(): Boolean {
+                accountImage.startAnimation(TranslateAnimation(0F, 0F, 0F, -accountImage.width.toFloat()).apply { duration = 300 })
+                homeViewModel.onAccountPictureSwipeTop()
+                return true
+            }
+
+            override fun onSwipeBottom(): Boolean {
+                accountImage.startAnimation(TranslateAnimation(0F, 0F, 0F, accountImage.width.toFloat()).apply { duration = 300 })
+                homeViewModel.onAccountPictureSwipeBottom()
+                return true
+            }
+        })
     }
 
     override fun subscribe(): Disposable = CompositeDisposable(
             homeViewModel.circleAvatarUrl.subscribe { avatarUrl ->
                 Picasso.get()
-                        .load(avatarUrl)
+                        .load(avatarUrl.value)
                         .placeholder(R.drawable.ic_account_unknown)
                         .into(accountImage)
+
+                accountImage.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.account_picture_scale))
             },
             homeViewModel.isBottomAccountSheetVisible.subscribe { isVisible ->
                 if (isVisible)
@@ -109,6 +139,17 @@ class HomeFragment : MVVMFragment() {
             },
             homeViewModel.signedUsers.subscribe { listUsers ->
                 signedUsersAdapter.submitList(listUsers)
+            },
+            homeViewModel.logOutDialogUser.subscribe { userOptional ->
+                if (userOptional.value != null) {
+                    logoutAlertDialog.setMessage(
+                            getString(
+                                    R.string.do_you_really_want_to_log_out_from,
+                                    userOptional.value.name
+                            )
+                    )
+                    logoutAlertDialog.show()
+                } else logoutAlertDialog.dismiss()
             }
     )
 }

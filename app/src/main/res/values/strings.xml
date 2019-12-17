@@ -12,7 +12,7 @@
     <string name="check_your_connection">Check your connection</string>
     <string name="unknown_exception">Unknown exception</string>
     <string name="you_are_already_signed_in">You are already signed in</string>
-    <string name="do_you_really_want_to_log_out_from">Do you really want to log out from "%1$s?"</string>
+    <string name="do_you_really_want_to_log_out_from">Do you really want to log out from \"%1$s?\"</string>
     <string name="logout">logout</string>
     <string name="add_account">Add account</string>
 </resources>

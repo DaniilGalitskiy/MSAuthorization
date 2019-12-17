@@ -6,13 +6,11 @@ import io.reactivex.Observable
 
 interface UserInfoModel {
 
-    fun getCurrentUser(): Observable<DynamicUser>
-
     fun getAllUsers(): Observable<List<DynamicUser>>
 
     fun updateClearAndInsertAuthorizations(): Completable
 
     fun updateClearAndSetCurrentUserById(id: Long): Completable
 
-    fun deleteUserById(dynamicUser: DynamicUser): Completable
+    fun deleteUser(dynamicUser: DynamicUser): Completable
 }
