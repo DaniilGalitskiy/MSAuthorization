@@ -6,7 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.animation.AnimationUtils
+import android.view.animation.AnimationSet
+import android.view.animation.ScaleAnimation
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
@@ -39,6 +40,7 @@ class HomeFragment : MVVMFragment() {
                     { user -> homeViewModel.onAccountBottomSheetClick(user) },
                     { user -> homeViewModel.onLogoutBottomSheetClick(user) }
             )
+    private var animationSet = AnimationSet(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,13 +112,32 @@ class HomeFragment : MVVMFragment() {
 
         accountImage.setOnTouchListener(object : OnSwipeTouchListener() {
             override fun onSwipeTop(): Boolean {
-                accountImage.startAnimation(TranslateAnimation(0F, 0F, 0F, -accountImage.width.toFloat()).apply { duration = 300 })
+                animationSet = AnimationSet(false)
+                animationSet.addAnimation(
+                        TranslateAnimation(
+                                0F,
+                                0F,
+                                0F,
+                                -homeToolbar.width.toFloat()
+                        ).apply {
+                            duration = 500
+                        })
                 homeViewModel.onAccountPictureSwipeTop()
                 return true
             }
 
             override fun onSwipeBottom(): Boolean {
-                accountImage.startAnimation(TranslateAnimation(0F, 0F, 0F, accountImage.width.toFloat()).apply { duration = 300 })
+                animationSet = AnimationSet(false)
+                animationSet.addAnimation(
+                        TranslateAnimation(
+                                0F,
+                                0F,
+                                0F,
+                                homeToolbar.width.toFloat()
+                        ).apply {
+                            duration = 500
+                        })
+
                 homeViewModel.onAccountPictureSwipeBottom()
                 return true
             }
@@ -127,10 +148,21 @@ class HomeFragment : MVVMFragment() {
             homeViewModel.circleAvatarUrl.subscribe { avatarUrl ->
                 Picasso.get()
                         .load(avatarUrl.value)
-                        .placeholder(R.drawable.ic_account_unknown)
                         .into(accountImage)
 
-                accountImage.startAnimation(AnimationUtils.loadAnimation(activity, R.anim.account_picture_scale))
+                animationSet.addAnimation(ScaleAnimation(
+                        0f,
+                        1f,
+                        0f,
+                        1f,
+                        (accountImage.width / 2).toFloat(),
+                        (homeToolbar.height / 2).toFloat()
+                ).apply {
+                    duration = 500; startOffset = 800; startTime = 800
+                }
+                )
+                accountImage.startAnimation(animationSet)
+                animationSet = AnimationSet(false)
             },
             homeViewModel.isBottomAccountSheetVisible.subscribe { isVisible ->
                 if (isVisible)

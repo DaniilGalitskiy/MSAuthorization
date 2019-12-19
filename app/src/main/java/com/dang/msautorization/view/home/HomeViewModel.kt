@@ -22,22 +22,25 @@ class HomeViewModel(private val router: Router, private val userInfoModel: UserI
     }
 
 
-    override val circleAvatarUrl = BehaviorSubject.create<Optional<String>>()
+
+    private val logOutDialogUserBehaviourSubject = BehaviorSubject.create<Optional<DynamicUser>>()
+
+
+    private val signedUsersBehaviorSubject = BehaviorSubject.create<List<DynamicUser>>()
             .apply {
                 userInfoModel.getAllUsers()
-                        .map { userList ->
-                            Optional(userList.find { it.isActive }?.avatar)
-                        }
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this)
             }
 
-    private val logOutDialogUserBehaviourSubject = BehaviorSubject.create<Optional<DynamicUser>>()
-
-    private val signedUsersBehaviorSubject = BehaviorSubject.create<List<DynamicUser>>()
+    override val circleAvatarUrl = BehaviorSubject.create<Optional<String>>()
             .apply {
-                userInfoModel.getAllUsers()
+                signedUsersBehaviorSubject
+                        .map { userList ->
+                            Optional(userList.find { it.isActive }?.avatar)
+                        }
+                        .distinctUntilChanged()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this)

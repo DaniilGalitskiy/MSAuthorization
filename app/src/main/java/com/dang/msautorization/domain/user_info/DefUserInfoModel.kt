@@ -27,7 +27,7 @@ class DefUserInfoModel(private val db: UserDao, private val api: Api) : UserInfo
                 )
             }.ignoreElements()!!
 
-    override fun getAllUsers() = db.getAllUsers().map { userList ->
+    override fun getAllUsers() = db.getAllUsers()/*.map { userList ->
         userList.map { user ->
             DynamicUser(
                     id = user.id,
@@ -37,7 +37,7 @@ class DefUserInfoModel(private val db: UserDao, private val api: Api) : UserInfo
                     isActive = user.isActive
             )
         }
-    }!!
+    }!!*/
 
     override fun updateClearAndSetCurrentUserById(id: Long) =
             Completable.fromAction { db.clearAndSetCurrentUserById(id) }
