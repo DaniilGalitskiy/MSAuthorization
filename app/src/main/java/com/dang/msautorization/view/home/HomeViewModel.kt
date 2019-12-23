@@ -22,9 +22,7 @@ class HomeViewModel(private val router: Router, private val userInfoModel: UserI
     }
 
 
-
     private val logOutDialogUserBehaviourSubject = BehaviorSubject.create<Optional<DynamicUser>>()
-
 
     private val signedUsersBehaviorSubject = BehaviorSubject.create<List<DynamicUser>>()
             .apply {

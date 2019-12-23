@@ -6,26 +6,25 @@ import io.reactivex.Observable
 
 interface IHomeViewModel {
 
+    val signedUsers: Observable<List<DynamicUser>>
+
     val circleAvatarUrl: Observable<Optional<String>>
 
     val isBottomAccountSheetVisible: Observable<Boolean>
-    val signedUsers: Observable<List<DynamicUser>>
 
     val logOutDialogUser: Observable<Optional<DynamicUser>>
 
 
-
     fun onAccountPictureClick()
+    fun onAccountPictureSwipeTop()
+    fun onAccountPictureSwipeBottom()
 
     fun onAccountBottomSheetClick(dynamicUser: DynamicUser)
     fun onLogoutBottomSheetClick(dynamicUser: DynamicUser)
     fun onAddAccountBottomSheetClick()
-
     fun onAccountBottomSheetDialogDismiss()
 
     fun onDismissLogoutAlertDialogClick()
     fun onLogoutAlertDialogClick()
 
-    fun onAccountPictureSwipeTop()
-    fun onAccountPictureSwipeBottom()
 }

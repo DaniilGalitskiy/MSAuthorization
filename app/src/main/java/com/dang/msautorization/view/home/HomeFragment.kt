@@ -2,11 +2,12 @@ package com.dang.msautorization.view.home
 
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.animation.AnimationSet
+import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
@@ -20,6 +21,7 @@ import com.dang.msautorization.R
 import com.dang.msautorization.adapter.SignedUsersAdapter
 import com.dang.msautorization.core.MVVMFragment
 import com.dang.msautorization.utilities.OnSwipeTouchListener
+import com.dang.msautorization.view.home.AccountPictureSwipeState.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.picasso.Picasso
 import io.reactivex.disposables.CompositeDisposable
@@ -40,7 +42,8 @@ class HomeFragment : MVVMFragment() {
                     { user -> homeViewModel.onAccountBottomSheetClick(user) },
                     { user -> homeViewModel.onLogoutBottomSheetClick(user) }
             )
-    private var animationSet = AnimationSet(false)
+
+    private var swipeAnimationState = EMPTYSWIPE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,12 +101,12 @@ class HomeFragment : MVVMFragment() {
                 )
         )
                 .setCancelable(true)
-                .setPositiveButton(getString(R.string.logout)) { dialog, _ ->
+                .setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
+                    dialog!!.cancel(); dialog.dismiss()
+                }
+                .setNegativeButton(R.string.logout) { dialog, _ ->
                     dialog!!.dismiss()
                     homeViewModel.onLogoutAlertDialogClick()
-                }
-                .setNegativeButton("cancel") { dialog, _ ->
-                    dialog!!.cancel(); dialog.dismiss()
                 }
                 .setOnDismissListener {
                     homeViewModel.onDismissLogoutAlertDialogClick()
@@ -112,58 +115,62 @@ class HomeFragment : MVVMFragment() {
 
         accountImage.setOnTouchListener(object : OnSwipeTouchListener() {
             override fun onSwipeTop(): Boolean {
-                animationSet = AnimationSet(false)
-                animationSet.addAnimation(
-                        TranslateAnimation(
-                                0F,
-                                0F,
-                                0F,
-                                -homeToolbar.width.toFloat()
-                        ).apply {
-                            duration = 500
-                        })
+                swipeAnimationState = TOPSWIPE
                 homeViewModel.onAccountPictureSwipeTop()
                 return true
             }
 
             override fun onSwipeBottom(): Boolean {
-                animationSet = AnimationSet(false)
-                animationSet.addAnimation(
-                        TranslateAnimation(
-                                0F,
-                                0F,
-                                0F,
-                                homeToolbar.width.toFloat()
-                        ).apply {
-                            duration = 500
-                        })
-
+                swipeAnimationState = BOTTOMSWIPE
                 homeViewModel.onAccountPictureSwipeBottom()
                 return true
             }
         })
     }
 
+    private fun picassoAnimFadePictureStart(avatarUrl: String?) {
+
+        val fadePictureAnimation = ScaleAnimation(
+                0f, 1f, 0f, 1f,
+                (accountImage.width / 2).toFloat(),
+                (homeToolbar.height / 2).toFloat()
+        ).apply {
+            duration = 500
+        }
+
+        Picasso.get()
+                .load(avatarUrl)
+                .into(accountImage)
+        accountImage.startAnimation(fadePictureAnimation)
+    }
+
     override fun subscribe(): Disposable = CompositeDisposable(
             homeViewModel.circleAvatarUrl.subscribe { avatarUrl ->
-                Picasso.get()
-                        .load(avatarUrl.value)
-                        .into(accountImage)
 
-                animationSet.addAnimation(ScaleAnimation(
-                        0f,
-                        1f,
-                        0f,
-                        1f,
-                        (accountImage.width / 2).toFloat(),
-                        (homeToolbar.height / 2).toFloat()
-                ).apply {
-                    duration = 500; startOffset = 800; startTime = 800
+                when (swipeAnimationState) {
+                    EMPTYSWIPE -> {
+                        picassoAnimFadePictureStart(avatarUrl.value)
+                    }
+                    else -> {
+                        accountImage.startAnimation(TranslateAnimation(
+                                0F, 0F, 0F,
+                                if (swipeAnimationState == TOPSWIPE) -homeToolbar.width.toFloat() else homeToolbar.width.toFloat()
+                        ).apply {
+                            duration = 500
+                            setAnimationListener(object : Animation.AnimationListener {
+                                override fun onAnimationEnd(animation: Animation) {
+                                    picassoAnimFadePictureStart(avatarUrl.value)
+                                    swipeAnimationState = EMPTYSWIPE
+                                }
+
+                                override fun onAnimationRepeat(animation: Animation) {}
+                                override fun onAnimationStart(animation: Animation) {}
+                            })
+                        })
+                    }
                 }
-                )
-                accountImage.startAnimation(animationSet)
-                animationSet = AnimationSet(false)
             },
+
             homeViewModel.isBottomAccountSheetVisible.subscribe { isVisible ->
                 if (isVisible)
                     bottomSheetDialog.show() else
@@ -175,9 +182,11 @@ class HomeFragment : MVVMFragment() {
             homeViewModel.logOutDialogUser.subscribe { userOptional ->
                 if (userOptional.value != null) {
                     logoutAlertDialog.setMessage(
-                            getString(
-                                    R.string.do_you_really_want_to_log_out_from,
-                                    userOptional.value.name
+                            Html.fromHtml(
+                                    getString(
+                                            R.string.do_you_really_want_to_log_out_from,
+                                            userOptional.value.name
+                                    )
                             )
                     )
                     logoutAlertDialog.show()

@@ -8,18 +8,19 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bottomHomeRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:overScrollMode="never" />
 
     <LinearLayout
         android:id="@+id/addAccountBottomSheetLinear"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/ripple_linear_add_account"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="@drawable/ripple_linear_add_account">
+        android:padding="16dp">
 
         <ImageView
             android:layout_width="wrap_content"
