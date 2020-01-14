@@ -32,7 +32,6 @@ class LoginFragment : MVVMFragment() {
         private const val STATE_KEY = "STATE_KEY"
     }
 
-    private lateinit var loginFailedSnackbar: Snackbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +55,7 @@ class LoginFragment : MVVMFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init(view)
+        init()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -64,12 +63,7 @@ class LoginFragment : MVVMFragment() {
         outState.putInt(STATE_KEY, loginViewModel.state.value!!.ordinal)
     }
 
-    private fun init(view: View) {
-        loginFailedSnackbar = Snackbar.make(view, "", Snackbar.LENGTH_LONG)
-        loginFailedSnackbar.setBackgroundTint(
-                ContextCompat.getColor(activity!!, R.color.colorDarkRed)
-        )
-        loginFailedSnackbar.setTextColor(ContextCompat.getColor(activity!!, R.color.whiteTopPanel))
+    private fun init() {
 
         skipButton.setOnClickListener {
             loginViewModel.onSkipButtonClick()
@@ -129,6 +123,13 @@ class LoginFragment : MVVMFragment() {
         loginButton.isEnabled = false
         skipButton.isEnabled = false
         passwordTextInputLayout.isEnabled = false
+    }
+
+    private val loginFailedSnackbar by lazy {
+        view!!.let { Snackbar.make(it, "", Snackbar.LENGTH_LONG).apply {
+            setBackgroundTint(ContextCompat.getColor(activity!!, R.color.colorDarkRed))
+            setTextColor(ContextCompat.getColor(activity!!, R.color.whiteTopPanel)) }
+        }
     }
 
     override fun subscribe(): Disposable = CompositeDisposable(

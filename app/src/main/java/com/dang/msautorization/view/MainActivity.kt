@@ -80,8 +80,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.component.inject(this)
         setContentView(R.layout.activity_main)
+        App.component.inject(this)
 
         if (savedInstanceState == null) {
             router.newRootScreen(if (sharedPrefsScreen.isHome) Screens.HomeScreen() else Screens.LoginScreen())

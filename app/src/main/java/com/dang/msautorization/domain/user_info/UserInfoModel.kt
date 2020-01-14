@@ -8,9 +8,9 @@ interface UserInfoModel {
 
     fun getAllUsers(): Observable<List<DynamicUser>>
 
-    fun updateClearAndInsertAuthorizations(): Completable
+    fun reloadAuthorizations(): Completable
 
-    fun updateClearAndSetCurrentUserById(id: Long): Completable
+    fun changeCurrentUserById(id: Long): Completable
 
-    fun deleteUser(dynamicUser: DynamicUser): Completable
+    fun deleteUser(id: Long): Completable
 }

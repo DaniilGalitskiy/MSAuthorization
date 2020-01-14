@@ -2,20 +2,17 @@ package com.dang.msautorization.domain.authorization
 
 import com.dang.msautorization.repository.db.dao.UserDao
 import com.dang.msautorization.repository.db.entity.Authorization
-import com.dang.msautorization.repository.db.entity.AuthorizationResult
 import com.dang.msautorization.repository.net.Api
-import com.dang.msautorization.repository.net.model.UserLogin
+import io.reactivex.Completable
 import io.reactivex.Single
 
 class DefUserAuthorizationModel(private val db: UserDao, private val api: Api) :
         UserAuthorizationModel {
 
-    override fun setAuthorizationLogin(credential: String,
-                                       userLogin: UserLogin,
-                                       username: String): Single<AuthorizationResult> =
-            api.loginUser(credential, userLogin)
+    override fun login(credential: String, username: String): Completable =
+            api.loginUser(credential)
                     .doOnSuccess {
-                        db.updateClearAuthorizations()
+                        db.clearActiveAuthorizations()
                         db.insertAuthorizationUser(
                                 Authorization(
                                         id = it.id,
@@ -24,9 +21,9 @@ class DefUserAuthorizationModel(private val db: UserDao, private val api: Api) :
                                         credential = credential
                                 )
                         )
+                    }.ignoreElement()
 
-                    }
 
-    override fun isSignedUserByName(name: String): Single<Int> =
-            db.isSignedUserByName(name)
+    override fun isCheckSameSignedUserByName(name: String): Single<Boolean> =
+            db.isCheckSameSignedUserByName(name)
 }

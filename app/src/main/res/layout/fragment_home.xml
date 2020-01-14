@@ -20,7 +20,7 @@
             android:id="@+id/accountImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:layout_marginEnd="8dp"
             android:elevation="4dp"
             android:foreground="?actionBarItemBackground"

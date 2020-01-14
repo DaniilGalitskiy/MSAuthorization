@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+
+    <item android:state_selected="true">
+        <ripple android:color="@color/colorRippleButtons" tools:ignore="NewApi">
+            <item>
+                <color android:color="@color/rippleAccount" />
+            </item>
+        </ripple>
+    </item>
+
+    <item>
+        <ripple android:color="@color/rippleAccount" tools:ignore="NewApi" />
+    </item>
+</selector>

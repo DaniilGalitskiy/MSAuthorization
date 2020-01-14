@@ -5,11 +5,10 @@ import com.dang.msautorization.R
 import com.dang.msautorization.Screens
 import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
-import com.dang.msautorization.repository.db.entity.AuthorizationResult
-import com.dang.msautorization.repository.net.model.UserLogin
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposables
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -47,6 +46,8 @@ class LoginViewModel(
     private val loginUserStateFailedSnackbarPublishSubject = PublishSubject.create<Int>()
     private val loginPasswordStateFailedSnackbarPublishSubject = PublishSubject.create<Int>()
 
+    private var loginDisposable = Disposables.disposed()
+
 
     override val state get() = stateBehaviorSubject
 
@@ -76,47 +77,40 @@ class LoginViewModel(
 
     override fun onLoginButtonClick() {
         val credential = Credentials.basic(
-                usernameBehaviorSubject.value.toString(),
-                passwordBehaviorSubject.value.toString()
+                usernameBehaviorSubject.value!!,
+                passwordBehaviorSubject.value!!
         )
-        userAuthorizationModel.setAuthorizationLogin(
-                credential,
-                UserLogin(),
-                usernameBehaviorSubject.value!!
-        ).subscribeOn(Schedulers.io())
+        loginDisposable.dispose()
+        loginDisposable = userAuthorizationModel.login(credential, usernameBehaviorSubject.value!!)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : DisposableSingleObserver<AuthorizationResult>() {
-                    override fun onSuccess(authorizationResult: AuthorizationResult) {
-                        if (sharedPrefsScreen.isHome) {
-                            router.backTo(Screens.HomeScreen())
-                        } else {
-                            router.newRootScreen(Screens.HomeScreen())
-                            sharedPrefsScreen.isHome = true
-                        }
+                .subscribe({
+                    if (sharedPrefsScreen.isHome) {
+                        router.backTo(Screens.HomeScreen())
+                    } else {
+                        router.newRootScreen(Screens.HomeScreen())
+                        sharedPrefsScreen.isHome = true
                     }
-
-                    override fun onError(e: Throwable) {
-                        when (e) {
-                            is HttpException ->
-                                loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.wrong_credentials)
-                            is UnknownHostException ->
-                                loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.check_your_connection)
-                            else ->
-                                loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.unknown_exception)
-                        }
+                }, { error ->
+                    when (error) {
+                        is HttpException ->
+                            loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.wrong_credentials)
+                        is UnknownHostException ->
+                            loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.check_your_connection)
+                        else ->
+                            loginPasswordStateFailedSnackbarPublishSubject.onNext(R.string.unknown_exception)
                     }
 
                 })
-
     }
+
 
     override fun onBackButtonClick() {
         state.onNext(ScreenLoginState.USER)
     }
 
     override fun onNextButtonClick() {
-        userAuthorizationModel.isSignedUserByName(usernameBehaviorSubject.value!!)
-                .map { it > 0 }
+        userAuthorizationModel.isCheckSameSignedUserByName(usernameBehaviorSubject.value!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : DisposableSingleObserver<Boolean>() {

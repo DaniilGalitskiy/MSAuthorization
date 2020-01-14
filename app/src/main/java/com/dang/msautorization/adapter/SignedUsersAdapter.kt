@@ -33,7 +33,7 @@ class SignedUsersAdapter(private val onItemClick: (user: DynamicUser) -> Unit,
             )
 
     override fun onBindViewHolder(holder: ListenItemViewHolder, position: Int) {
-        holder.bind(getItem(position), position)
+        holder.bind(getItem(position))
     }
 
 
@@ -44,7 +44,6 @@ class SignedUsersAdapter(private val onItemClick: (user: DynamicUser) -> Unit,
         private val avatarBottomSheetView = itemView.avatarBottomSheetImageView
         private val loginBottomSheetTextView = itemView.loginBottomSheetTextView
         private val logoutBottomSheetButton = itemView.logoutBottomSheetButton
-        private val itemBottomSheetLinear = itemView.itemBottomSheetLinear
 
         init {
             itemView.setOnClickListener {
@@ -56,7 +55,7 @@ class SignedUsersAdapter(private val onItemClick: (user: DynamicUser) -> Unit,
             }
         }
 
-        fun bind(listItem: DynamicUser, position: Int) {
+        fun bind(listItem: DynamicUser) {
             this.user = listItem
 
             loginBottomSheetTextView.text = listItem.name
@@ -65,8 +64,7 @@ class SignedUsersAdapter(private val onItemClick: (user: DynamicUser) -> Unit,
                     .placeholder(R.drawable.ic_account_unknown)
                     .into(avatarBottomSheetView)
 
-            if (user.isActive)
-                itemBottomSheetLinear.setBackgroundResource(R.color.rippleAccount)
+            itemView.isSelected = user.isActive
         }
     }
 }

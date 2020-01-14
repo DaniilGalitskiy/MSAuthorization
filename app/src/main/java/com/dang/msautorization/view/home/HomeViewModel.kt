@@ -6,6 +6,7 @@ import com.dang.msautorization.domain.user_info.UserInfoModel
 import com.dang.msautorization.domain.user_info.entity.DynamicUser
 import com.dang.msautorization.utilities.Optional
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
@@ -15,10 +16,14 @@ class HomeViewModel(private val router: Router, private val userInfoModel: UserI
         IHomeViewModel {
 
 
+    private var disposableReloadAuthorizations = Disposables.disposed()
+
     init {
-        userInfoModel.run {
-            updateClearAndInsertAuthorizations().subscribeOn(Schedulers.io()).subscribe({}, {})
-        }
+        disposableReloadAuthorizations.dispose()
+        disposableReloadAuthorizations =
+                userInfoModel.reloadAuthorizations()
+                        .subscribeOn(Schedulers.io())
+                        .subscribe({}, {}) //reload
     }
 
 
@@ -66,7 +71,7 @@ class HomeViewModel(private val router: Router, private val userInfoModel: UserI
     }
 
     override fun onAccountBottomSheetClick(dynamicUser: DynamicUser) {
-        userInfoModel.updateClearAndSetCurrentUserById(dynamicUser.id)
+        userInfoModel.changeCurrentUserById(dynamicUser.id)
                 .subscribeOn(Schedulers.io())
                 .subscribe()
         bottomAccountSheetVisibleBehaviourSubject.onNext(false)
@@ -87,7 +92,7 @@ class HomeViewModel(private val router: Router, private val userInfoModel: UserI
     }
 
     override fun onLogoutAlertDialogClick() {
-        userInfoModel.deleteUser(logOutDialogUserBehaviourSubject.value!!.value!!)
+        userInfoModel.deleteUser(logOutDialogUserBehaviourSubject.value!!.value!!.id)
                 .subscribeOn(Schedulers.io())
                 .subscribe()
         logOutDialogUserBehaviourSubject.onNext(Optional(null))
@@ -99,7 +104,7 @@ class HomeViewModel(private val router: Router, private val userInfoModel: UserI
                     if (signedUsersBehaviorSubject.value!!.indexOfFirst { dynamicUser -> dynamicUser.isActive } - 1 < 0)
                         signedUsersBehaviorSubject.value!!.lastIndex
                     else signedUsersBehaviorSubject.value!!.indexOfFirst { dynamicUser -> dynamicUser.isActive } - 1
-            userInfoModel.updateClearAndSetCurrentUserById(signedUsersBehaviorSubject.value!![prevIndex].id)
+            userInfoModel.changeCurrentUserById(signedUsersBehaviorSubject.value!![prevIndex].id)
                     .subscribeOn(Schedulers.io())
                     .subscribe()
         }
@@ -111,7 +116,7 @@ class HomeViewModel(private val router: Router, private val userInfoModel: UserI
                     if (signedUsersBehaviorSubject.value!!.indexOfFirst { dynamicUser -> dynamicUser.isActive } + 1 > signedUsersBehaviorSubject.value!!.lastIndex)
                         0
                     else signedUsersBehaviorSubject.value!!.indexOfFirst { dynamicUser -> dynamicUser.isActive } + 1
-            userInfoModel.updateClearAndSetCurrentUserById(signedUsersBehaviorSubject.value!![nextIndex].id)
+            userInfoModel.changeCurrentUserById(signedUsersBehaviorSubject.value!![nextIndex].id)
                     .subscribeOn(Schedulers.io())
                     .subscribe()
         }

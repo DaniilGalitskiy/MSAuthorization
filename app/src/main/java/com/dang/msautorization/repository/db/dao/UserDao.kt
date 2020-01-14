@@ -10,8 +10,8 @@ import io.reactivex.Single
 @Dao
 interface UserDao {
 
-    @Query("SELECT COUNT(id) FROM Authorization WHERE name like :name limit 1")
-    fun isSignedUserByName(name: String): Single<Int>
+    @Query("SELECT COUNT(id) FROM Authorization WHERE name like :name")
+    fun isCheckSameSignedUserByName(name: String): Single<Boolean>
 
 
     @Query("SELECT * FROM Authorization")
@@ -23,15 +23,15 @@ interface UserDao {
 
     @Transaction
     fun clearAndSetCurrentUserById(id: Long) {
-        updateClearAuthorizations()
-        updateCurrentAuthorizations(id)
+        clearActiveAuthorizations()
+        updateCurrentAuthorization(id)
     }
 
     @Query("UPDATE Authorization SET isActive = 1 WHERE id = :id")
-    fun updateCurrentAuthorizations(id: Long)
+    fun updateCurrentAuthorization(id: Long)
 
     @Query("UPDATE Authorization SET isActive = 0 WHERE isActive = 1")
-    fun updateClearAuthorizations()
+    fun clearActiveAuthorizations()
 
 
     @Query(
@@ -60,4 +60,11 @@ interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUser(user: User)
+
+
+    @Query("SELECT credential FROM User where authorizationUserId = :id")
+    fun getCredentialById(id: Long): String
+
+    @Query("SELECT isActive FROM Authorization where id = :id")
+    fun getIsActiveById(id: Long): Boolean
 }

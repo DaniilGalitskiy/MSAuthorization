@@ -1,8 +1,11 @@
 package com.dang.msautorization.view.home
 
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
-import android.text.Html
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +38,7 @@ class HomeFragment : MVVMFragment() {
     @Inject
     lateinit var homeViewModel: IHomeViewModel
 
-    private lateinit var bottomSheetDialog: BottomSheetDialog
+
     private lateinit var logoutAlertDialog: AlertDialog
     private val signedUsersAdapter =
             SignedUsersAdapter(
@@ -44,6 +47,10 @@ class HomeFragment : MVVMFragment() {
             )
 
     private var swipeAnimationState = EMPTYSWIPE
+
+    companion object {
+        const val DURATION_SWIPE = 500L
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,19 +87,6 @@ class HomeFragment : MVVMFragment() {
             homeViewModel.onAccountPictureClick()
         }
 
-        bottomSheetDialog = BottomSheetDialog(activity!!)
-        val sheetView: View = activity!!.layoutInflater
-                .inflate(R.layout.dialog_bottom_sheet_home, null)
-        bottomSheetDialog.setContentView(sheetView)
-        bottomSheetDialog.setOnDismissListener { homeViewModel.onAccountBottomSheetDialogDismiss() }
-
-        val bottomHomeRecyclerView =
-                sheetView.findViewById(R.id.bottomHomeRecyclerView) as RecyclerView
-        bottomHomeRecyclerView.layoutManager = LinearLayoutManager(activity)
-        bottomHomeRecyclerView.adapter = signedUsersAdapter
-
-        sheetView.findViewById<LinearLayout>(R.id.addAccountBottomSheetLinear)
-                .setOnClickListener { homeViewModel.onAddAccountBottomSheetClick() }
 
         val adb: AlertDialog.Builder = AlertDialog.Builder(
                 ContextThemeWrapper(
@@ -135,18 +129,47 @@ class HomeFragment : MVVMFragment() {
                 (accountImage.width / 2).toFloat(),
                 (homeToolbar.height / 2).toFloat()
         ).apply {
-            duration = 500
+            duration = DURATION_SWIPE
         }
-
-        Picasso.get()
-                .load(avatarUrl)
-                .into(accountImage)
+        if (avatarUrl == null) {
+            accountImage.setImageDrawable(
+                    ContextCompat.getDrawable(
+                            this.activity!!,
+                            R.drawable.ic_account_unknown
+                    )
+            )
+        } else {
+            Picasso.get()
+                    .load(avatarUrl)
+                    .into(accountImage)
+        }
         accountImage.startAnimation(fadePictureAnimation)
     }
 
+
+    private val bottomSheetDialog by lazy {
+
+        val sheetView: View = activity!!.layoutInflater
+                .inflate(R.layout.dialog_bottom_sheet_home, null)
+
+        sheetView.findViewById<LinearLayout>(R.id.addAccountBottomSheetLinear)
+                .setOnClickListener { homeViewModel.onAddAccountBottomSheetClick() }
+
+        val bottomHomeRecyclerView =
+                sheetView.findViewById(R.id.bottomHomeRecyclerView) as RecyclerView
+
+        bottomHomeRecyclerView.layoutManager = LinearLayoutManager(activity)
+        bottomHomeRecyclerView.adapter = signedUsersAdapter
+
+        BottomSheetDialog(activity!!).apply {
+            setContentView(sheetView)
+            setOnDismissListener { homeViewModel.onAccountBottomSheetDialogDismiss() }
+        }
+    }
+
+
     override fun subscribe(): Disposable = CompositeDisposable(
             homeViewModel.circleAvatarUrl.subscribe { avatarUrl ->
-
                 when (swipeAnimationState) {
                     EMPTYSWIPE -> {
                         picassoAnimFadePictureStart(avatarUrl.value)
@@ -156,7 +179,7 @@ class HomeFragment : MVVMFragment() {
                                 0F, 0F, 0F,
                                 if (swipeAnimationState == TOPSWIPE) -homeToolbar.width.toFloat() else homeToolbar.width.toFloat()
                         ).apply {
-                            duration = 500
+                            duration = DURATION_SWIPE
                             setAnimationListener(object : Animation.AnimationListener {
                                 override fun onAnimationEnd(animation: Animation) {
                                     picassoAnimFadePictureStart(avatarUrl.value)
@@ -181,14 +204,19 @@ class HomeFragment : MVVMFragment() {
             },
             homeViewModel.logOutDialogUser.subscribe { userOptional ->
                 if (userOptional.value != null) {
-                    logoutAlertDialog.setMessage(
-                            Html.fromHtml(
-                                    getString(
-                                            R.string.do_you_really_want_to_log_out_from,
-                                            userOptional.value.name
-                                    )
+                    logoutAlertDialog.setMessage(SpannableString(
+                            getString(
+                                    R.string.do_you_really_want_to_log_out_from,
+                                    userOptional.value.name
                             )
-                    )
+                    ).apply {
+                        this.setSpan(
+                                StyleSpan(Typeface.BOLD),
+                                0,
+                                this.length,
+                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                        )
+                    })
                     logoutAlertDialog.show()
                 } else logoutAlertDialog.dismiss()
             }
