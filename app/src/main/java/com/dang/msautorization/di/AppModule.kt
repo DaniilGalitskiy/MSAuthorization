@@ -6,8 +6,8 @@ import com.dang.msautorization.domain.authorization.UserAuthorizationModel
 import com.dang.msautorization.domain.authorization.DefUserAuthorizationModel
 import com.dang.msautorization.domain.connect_network.DefNetworkConnectModel
 import com.dang.msautorization.domain.connect_network.NetworkConnectModel
-import com.dang.msautorization.repository.db.AppDatabase
 import com.dang.msautorization.repository.db.dao.UserDao
+import com.dang.msautorization.repository.db.AppDatabase
 import com.dang.msautorization.repository.net.Api
 import com.dang.msautorization.repository.pref.DefSharedPrefsScreen
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
