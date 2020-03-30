@@ -9,8 +9,8 @@ import com.dang.msautorization.domain.connect_network.NetworkConnectModel
 import com.dang.msautorization.repository.db.dao.UserDao
 import com.dang.msautorization.repository.db.AppDatabase
 import com.dang.msautorization.repository.net.Api
-import com.dang.msautorization.repository.pref.DefSharedPrefsScreen
 import com.dang.msautorization.repository.pref.SharedPrefsScreen
+import com.dang.msautorization.repository.pref.DefSharedPrefsScreen
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
