@@ -36,6 +36,7 @@ class AppModule {
     fun userDao(db: AppDatabase): UserDao = db.getUserDao()
 
 
+
     @Provides
     fun api(): Api {
         val okHttpClient = OkHttpClient().newBuilder()
