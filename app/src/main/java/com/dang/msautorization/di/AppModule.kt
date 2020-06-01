@@ -44,6 +44,7 @@ class AppModule {
                 .connectTimeout(Api.CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .build()
 
+
         val retrofit = Retrofit.Builder()
                 .baseUrl(Api.URL)
                 .addConverterFactory(GsonConverterFactory.create())
