@@ -32,6 +32,7 @@ class AppModule {
                     .fallbackToDestructiveMigration()
                     .build()
 
+
     @Provides
     fun userDao(db: AppDatabase): UserDao = db.getUserDao()
 
