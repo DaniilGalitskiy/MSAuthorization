@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">MSAutorization</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="username">Username</string>
+    <string name="login_to_github">Login to Github</string>
+    <string name="back">Back</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="no_network">No network</string>
+    <string name="wrong_credentials">Wrong credentials</string>
+    <string name="check_your_connection">Check your connection</string>
+    <string name="unknown_exception">Unknown exception</string>
+    <string name="you_are_already_signed_in">You are already signed in</string>
+    <string name="do_you_really_want_to_log_out_from">Do you really want to log out from \"%1$s?\"</string>
+    <string name="logout">logout</string>
+    <string name="cancel">cancel</string>
+    <string name="add_account">Add account</string>
 </resources>
